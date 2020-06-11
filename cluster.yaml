@@ -1,0 +1,18 @@
+---
+- hosts: all
+  gather_facts: yes
+  become: yes
+  roles:
+    - { role: basic, tags: basic }
+
+- hosts: master
+  gather_facts: yes
+  become: yes
+  roles:
+    - { role: etcd, tags: etcd }
+
+- hosts: kubernetes
+  gather_facts: yes
+  become: yes
+  roles:
+    - { role: docker, tags: docker }

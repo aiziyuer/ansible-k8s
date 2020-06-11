@@ -1,0 +1,34 @@
+[Unit]
+Description=Docker Application Container Engine
+After=network.target
+
+[Service]
+Type=notify
+NotifyAccess=main
+EnvironmentFile=-/etc/sysconfig/docker
+Environment=GOTRACEBACK=crash
+Environment=DOCKER_HTTP_HOST_COMPAT=1
+Environment=PATH=/usr/local/bin:/usr/bin:/usr/sbin
+ExecStart=/usr/local/bin/dockerd \
+          --add-runtime docker-runc=/usr/local/bin/docker-runc \
+          --default-runtime=docker-runc \
+          --userland-proxy-path=/usr/local/bin/docker-proxy \
+          --init-path=/usr/local/bin/docker-init \
+          --seccomp-profile=/etc/docker/seccomp.json \
+          $OPTIONS \
+          $DOCKER_STORAGE_OPTIONS \
+          $DOCKER_NETWORK_OPTIONS \
+          $ADD_REGISTRY \
+          $BLOCK_REGISTRY \
+          $INSECURE_REGISTRY \
+          $REGISTRIES
+ExecReload=/bin/kill -s HUP $MAINPID
+LimitNOFILE=1048576
+LimitNPROC=1048576
+LimitCORE=infinity
+TimeoutStartSec=0
+Restart=on-abnormal
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
