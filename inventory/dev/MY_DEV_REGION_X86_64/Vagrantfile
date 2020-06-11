@@ -50,6 +50,20 @@ boxes = [
       :mem => "512",
       :cpu => "1",
       :disks => "10"
+  },
+  {
+    :name => "node3",
+    :eth0 => "192.168.200.53",
+    :mem => "512",
+    :cpu => "1",
+    :disks => "10"
+  },
+  {
+    :name => "node4",
+    :eth0 => "192.168.200.54",
+    :mem => "512",
+    :cpu => "1",
+    :disks => "10"
   }
 ]
 
@@ -95,6 +109,8 @@ ONBOOT=yes
 IPADDR=#{ box[:eth0] }
 NETMASK=255.255.255.0
 GATEWAY=192.168.200.1
+PEERDNS=yes
+DNS1=10.10.10.254
 EOF
 
 sudo ifdown eth0
