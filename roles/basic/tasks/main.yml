@@ -34,10 +34,10 @@
      - tcpdump
      - fuse
      - fuse-libs
-     - glusterfs-libs-{{ gluster_version }}
-     - glusterfs-client-xlators-{{ gluster_version }}
-     - glusterfs-{{ gluster_version }}
-     - glusterfs-fuse-{{ gluster_version }}
+    #  - glusterfs-libs-{{ gluster_version }}
+    #  - glusterfs-client-xlators-{{ gluster_version }}
+    #  - glusterfs-{{ gluster_version }}
+    #  - glusterfs-fuse-{{ gluster_version }}
      - iptables
      - conntrack
      - sysstat
