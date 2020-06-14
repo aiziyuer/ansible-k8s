@@ -59,4 +59,4 @@
     state: restarted
     enabled: yes
 
-- command: systemctl is-active etcd
+- command: systemctl is-active docker
