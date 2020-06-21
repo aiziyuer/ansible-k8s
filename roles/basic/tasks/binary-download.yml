@@ -9,15 +9,15 @@
   get_url: url={{ item.url }} dest={{ item.dest | default('/tmp/repository')}} validate_certs=yes
   with_items:
    - { 
-       dest: '/tmp/repository/docker_{{ docker_version }}_linux_adm64.tgz', 
+       dest: '/tmp/repository/docker_v{{ docker_version }}_linux_adm64.tgz', 
        url: "https://download.docker.com/linux/static/stable/x86_64/docker-{{ docker_version }}.tgz" 
      }
    - { 
-       dest: '/tmp/repository/cfssl_{{ cfssl_version }}_linux_amd64.tar.gz', 
+       dest: '/tmp/repository/cfssl_v{{ cfssl_version }}_linux_amd64', 
        url: "https://github.com/cloudflare/cfssl/releases/download/v{{ cfssl_version }}/cfssl_{{ cfssl_version }}_linux_amd64"  
      }
    - { 
-       dest: '/tmp/repository/cfssljson_{{ cfssl_version }}_linux_amd64.tar.gz',
+       dest: '/tmp/repository/cfssljson_v{{ cfssl_version }}_linux_amd64',
        url: "https://github.com/cloudflare/cfssl/releases/download/v{{ cfssl_version }}/cfssljson_{{ cfssl_version }}_linux_amd64"
      }
    - { 
