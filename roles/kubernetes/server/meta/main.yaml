@@ -1,3 +1,3 @@
 ---
 dependencies:
-    - { role: kubernetes/common }
+    - { role: kubernetes/node }

@@ -6,7 +6,6 @@
    - /etc/systemd/system
    - /etc/kuberentes/mainifest
 
-
 - name: disable system swap
   shell: "swapoff -a"
 
@@ -60,6 +59,18 @@
   template: src={{ item.src }} dest={{ item.dest }} mode=0644
   with_items:
     - { src: kubelet.service.j2, dest: '/etc/systemd/system/kubelet.service' }
+
+- name: handle kubernetes-node
+  when: "'master' in group_names"
+  unarchive: 
+   src: "/tmp/repository/kubernetes-node_v1.16.3_linux_amd64.tar.gz"
+   dest: '/usr/local/bin'
+   remote_src: yes
+   extra_opts: 
+      - --strip=3
+   exclude:
+    - '*.tar'
+    - '*.docker_tag'
 
 - name: handle kubelet services
   systemd:
