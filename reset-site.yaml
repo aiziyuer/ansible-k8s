@@ -5,7 +5,7 @@
   become: yes
   tasks:
     - name: kubeadm reset
-      shell: "kubeadm reset"
+      shell: "kubeadm reset --force"
       ignore_errors: True
     
     - name: remove flannel interface
