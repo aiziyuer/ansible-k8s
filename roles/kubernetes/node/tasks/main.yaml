@@ -1,6 +1,6 @@
 ---
 
-- name: ensures dirs
+- name: ensures kuberentes node dirs
   file: path={{ item }} state=directory
   with_items:
    - /etc/systemd/system
@@ -14,7 +14,7 @@
     dest: /etc/fstab
     regexp: '(?i)^([^#][\S]+\s+(none|swap)\s+swap.*)'
     line: '# \1'
-    backfrefs: yes
+    backrefs: yes
     state: present
 
 - name: add kernel modules
@@ -63,7 +63,7 @@
 - name: handle kubernetes-node
   when: "'master' in group_names"
   unarchive: 
-   src: "/tmp/repository/kubernetes-node_v1.16.3_linux_amd64.tar.gz"
+   src: "/tmp/repository/kubernetes-node_{{ kubernetes_version }}_linux_amd64.tar.gz"
    dest: '/usr/local/bin'
    remote_src: yes
    extra_opts: 

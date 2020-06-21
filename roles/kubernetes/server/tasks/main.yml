@@ -10,7 +10,7 @@
 - name: handle kubernetes-server
   when: "'master' in group_names"
   unarchive: 
-   src: "/tmp/repository/kubernetes-server_v1.16.3_linux_amd64.tar.gz"
+   src: "/tmp/repository/kubernetes-server_{{ kubernetes_version }}_linux_amd64.tar.gz"
    dest: '/usr/local/bin'
    remote_src: yes
    extra_opts: 

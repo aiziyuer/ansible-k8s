@@ -1,9 +1,13 @@
 
-# software version
-docker_version: 18.03.1
-kube_version: v1.10.5
-kubernetes_cni_version: v0.6.0
+# binary software version
+docker_version: 19.03.9
+kubernetes_version: v1.16.3
+kubernetes_cni_version: v0.8.6
+cfssl_version: 1.4.1
+etcd_version: v3.4.9
 gluster_version: 4.1.9
+
+# docker software version
 flannel_version: v0.11.0
 
 # kubernete configuration
@@ -18,9 +22,3 @@ network_interface: "eth0"
 ansible_ssh_user: root
 ansible_ssh_pass: Changeme_123
 ansible_connection: ssh
-
-binary_cdn:
-  cfssl: "http://aiziyuer.synology.me:10080/pkg.cfssl.org/R1.2/cfssl_linux-amd64"
-  cfssljson : "http://aiziyuer.synology.me:10080/pkg.cfssl.org/R1.2/cfssljson_linux-amd64"
-  etcd: "http://aiziyuer.synology.me:10080/github.com/etcd-io/etcd/releases/download/v3.2.22/etcd-v3.2.22-linux-amd64.tar.gz"
-  docker: "http://aiziyuer.synology.me:10080/download.docker.com/linux/static/stable/x86_64/docker-18.03.1-ce.tgz"
