@@ -47,13 +47,13 @@
    rm -rf /usr/lib/systemd/system/kubelet.service || true
    rm -rf /usr/lib/systemd/system/kubelet.service.d || true
 
-- name: get cgroup driver from docker
+- name: get docker cgroup driver
   shell: |
-    docker info 2>/dev/null | sed -n 's/Cgroup Driver: \(.*\)/\1/p'
+    docker info 2>/dev/null | sed -n 's/Cgroup Driver:\s\+\(\S\+\)/\1/p'
   register: docker_cgroup_driver
 
 - set_fact:
-    docker_cgroup_driver={{ docker_cgroup_driver | default('cgroupfs') }}
+    docker_cgroup_driver={{ docker_cgroup_driver.stdout | default('cgroupfs') }}
 
 - name: add kubelet services
   template: src={{ item.src }} dest={{ item.dest }} mode=0644
