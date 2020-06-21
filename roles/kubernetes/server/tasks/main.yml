@@ -6,7 +6,8 @@
    - /etc/systemd/system
    - /etc/kuberentes/mainifest
    - /usr/local/bin
-   - /root/k8s
+   - "{{ lookup('env', 'HOME') }}/k8s"
+   - "{{ lookup('env', 'HOME') }}/.kube"
 
 - name: handle kubernetes-server
   when: "'master' in group_names"
@@ -31,5 +32,25 @@
    cd /root/k8s
    kubeadm init --config=kubeadmcfg.yml
   register: kubeadm_init
-- debut: var=kubeadm_init
+- debug: var=kubeadm_init
+
+- name: copy admin.conf to ~/.kube/config
+  copy:
+   src: "/etc/kubernetes/admin.conf"
+   dest: "{{ lookup('env', 'HOME') }}/.kube/config"
+   owner: "{{ ansible_user | default(ansible_user_id) }}"
+   group: "{{ ansible_user | default(ansible_user_id) }}"
+   mode: 0755
+   remote_src: true
+
+- name: wait cluster first node ready
+  when: groups['master'][0] == inventory_hostname
+  shell: |
+    while kubectl -n kube-system get pods --field-selector=status.phase==Running 2>&1 | grep '{{ item }}' >/dev/null; [ $? -ne 0 ]; do echo "wait for pods: {{ item}} ..."; sleep 2; done
+  with_items:
+    - 'kube-apiserver'
+    - 'kube-controller-mananger'
+    - 'kube-scheduler'
+
+# TODO master其他节点同步证书并且进行初始化安装
 
