@@ -1,0 +1,57 @@
+{% if kubernetes_version is version('v1.16.0', '>=') -%}
+
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: InitConfiguration
+bootstrapTokens:
+- groups:
+  - system:bootstrappers:kubeadm:default-node-token
+  token: {{ token }}
+  ttl: 0s
+  usages:
+  - signing
+  - authentication
+localAPIEndpoint:
+  advertiseAddress: {{ master_ip }}
+  bindPort: 6443
+nodeRegistration:
+  taints:
+  - effect: PreferNoSchedule
+    key: node-role.kubernetes.io/master
+---
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: ClusterConfiguration
+# imageRepository: registry.aliyuncs.com/google_containers
+kubernetesVersion: {{ kubernetes_version | regex_replace('^v(?P<prefix>(?:\d{1,3}\.){2}).+$', 'v\g<prefix>0') }}
+certificatesDir: /etc/kubernetes/pki
+networking:
+  podSubnet: {{ pod_network_cidr }}
+  serviceSubnet: {{ service_cidr }}
+  dnsDomain: {{ cluster_domain }}
+etcd:
+  external:
+    endpoints:
+{% for host in groups['master'] %}
+      - https://{{ hostvars[host]['ansible_' + network_interface]['ipv4']['address']}}:2379
+{% endfor %}
+    caFile: /etc/etcd/certs/ca.pem
+    certFile: /etc/etcd/certs/client.pem
+    keyFile: /etc/etcd/certs/client-key.pem
+apiServer:
+  certSANs:
+      - {{ master_ip }}
+{% for host in groups['master'] %}
+      - {{hostvars[host]['ansible_' + network_interface]['ipv4']['address']}}
+{% endfor %}
+      - {{ service_cidr | default('10.96.0.1') | regex_replace('^(?P<prefix>(?:\d{1,3}\.){3}).+$', '\g<prefix>1') }}
+      - {{ service_cidr | default('10.96.0.10') | regex_replace('^(?P<prefix>(?:\d{1,3}\.){3}).+$', '\g<prefix>10') }}
+  extraArgs:
+    advertise-address: {{ master_ip }}
+    enable-admission-plugins: AlwaysPullImages,DefaultStorageClass
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+mode: ipvs
+
+{% else -%}
+
+{% endif -%}

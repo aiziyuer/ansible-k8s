@@ -1,0 +1,24 @@
+---
+
+- hosts: all
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: kubeadm reset
+      shell: "kubeadm reset"
+      ignore_errors: True
+    
+    - name: remove flannel interface
+      command: ip link delete flannel.1
+      ignore_errors: True
+    
+    - name: remove cni0 bridge
+      command: ip link delete cni0
+      ignore_errors: True
+    
+    - name: clean etcd
+      shell: |
+        systemctl stop etcd
+        rm -rf /etc/etcd
+        rm -rf /var/lib/etcd
+      ignore_errors: True

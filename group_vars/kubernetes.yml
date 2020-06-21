@@ -1,0 +1,4 @@
+---
+
+# 优先使用inventory中指定的IP, 如果没有指定就使用master组的第一台作为集群的IP
+master_ip: "{{ hostvars[groups['master'][0]]['ansible_ssh_host'] }}"

@@ -6,6 +6,7 @@
    - /etc/systemd/system
    - /etc/kuberentes/mainifest
    - /usr/local/bin
+   - /root/k8s
 
 - name: handle kubernetes-server
   when: "'master' in group_names"
@@ -18,4 +19,17 @@
    exclude:
     - '*.tar'
     - '*.docker_tag'
+
+- name: genrate kubeadmcfg
+  template: src={{ item.src }} dest={{ item.dest }}
+  with_items:
+  - { src: "kubeadmcfg.yml.j2", dest: "/root/k8s/kubeadmcfg.yml" }
+
+- name: kubeadm init
+  when: groups['master'][0] == inventory_hostname
+  shell: |
+   cd /root/k8s
+   kubeadm init --config=kubeadmcfg.yml
+  register: kubeadm_init
+- debut: var=kubeadm_init
 
