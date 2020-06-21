@@ -16,36 +16,9 @@
    enabled: False
 
 - name: install nessary dependencies
+  include_tasks:  "yum-install.yml"
   when:
    - ansible_os_family == "RedHat"
-  yum:
-    state: present
-    update_cache: yes
-    name:
-     - curl
-     - net-tools
-     - unzip
-     - gzip
-     - tar
-     - git
-     - zsh
-     - jq
-     - telnet
-     - tcpdump
-     - fuse
-     - fuse-libs
-    #  - glusterfs-libs-{{ gluster_version }}
-    #  - glusterfs-client-xlators-{{ gluster_version }}
-    #  - glusterfs-{{ gluster_version }}
-    #  - glusterfs-fuse-{{ gluster_version }}
-     - iptables
-     - conntrack
-     - sysstat
-     - wget
-     - lrzsz
-     - nc
-     - pv
-     - sshpass
-     - iptables-services
-     - ipvsadm
-     - ipset
+
+- name: binary-download
+  include_tasks:  "binary-download.yml"

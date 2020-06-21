@@ -39,7 +39,7 @@
   when: 
     - true
   unarchive:
-    src: "{{ binary_cdn.docker }}"
+    src: "/tmp/repository/docker_19.03.9_linux_adm64.tgz"
     dest: /usr/local/bin
     remote_src: yes
     extra_opts:

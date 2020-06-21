@@ -1,0 +1,41 @@
+---
+
+- name: ensures dirs
+  file: path={{ item }} state=directory
+  with_items:
+   - /tmp/repository
+
+- name: download all
+  get_url: url={{ item.url }} dest={{ item.dest | default('/tmp/repository')}} validate_certs=yes
+  with_items:
+   - { dest: '/tmp/repository/docker_19.03.9_linux_adm64.tgz', url: "https://download.docker.com/linux/static/stable/x86_64/docker-19.03.9.tgz" }
+   - { dest: '/tmp/repository/cfssl_1.4.1_linux_amd64.tar.gz', url: "https://github.com/cloudflare/cfssl/releases/download/v1.4.1/cfssl_1.4.1_linux_amd64"  }
+   - { dest: '/tmp/repository/cfssljson_1.4.1_linux_amd64.tar.gz', url: "https://github.com/cloudflare/cfssl/releases/download/v1.4.1/cfssljson_1.4.1_linux_amd64" }
+   - { dest: '/tmp/repository/etcd_v3.4.9_linux_amd64.tar.gz', url: "https://github.com/etcd-io/etcd/releases/download/v3.4.9/etcd-v3.4.9-linux-amd64.tar.gz" }
+   - { dest: '/tmp/repository/kubernetes-server_v1.16.3_linux_amd64.tar.gz', url: "https://dl.k8s.io/v1.16.3/kubernetes-server-linux-amd64.tar.gz" }
+   - { dest: '/tmp/repository/kubernetes-node_v1.16.3_linux_amd64.tar.gz', url: "https://dl.k8s.io/v1.16.3/kubernetes-node-linux-amd64.tar.gz" }
+   - { dest: '/tmp/repository/cni-plugins_v0.8.6_linux_amd64.tgz', url: "https://github.com/containernetworking/plugins/releases/download/v0.8.6/cni-plugins-linux-amd64-v0.8.6.tgz" }
+
+- name: handle kubernetes-server
+  when: "'master' in group_names"
+  unarchive: 
+   src: "/tmp/repository/kubernetes-server_v1.16.3_linux_amd64.tar.gz"
+   dest: '/usr/local/bin'
+   remote_src: yes
+   extra_opts: 
+      - --strip=3
+   exclude:
+    - '*.tar'
+    - '*.docker_tag'
+ 
+- name: handle kubernetes-node
+  when: "'master' in group_names"
+  unarchive: 
+   src: "/tmp/repository/kubernetes-node_v1.16.3_linux_amd64.tar.gz"
+   dest: '/usr/local/bin'
+   remote_src: yes
+   extra_opts: 
+      - --strip=3
+   exclude:
+    - '*.tar'
+    - '*.docker_tag'
