@@ -49,7 +49,7 @@
     while kubectl -n kube-system get pods --field-selector=status.phase==Running 2>&1 | grep '{{ item }}' >/dev/null; [ $? -ne 0 ]; do echo "wait for pods: {{ item}} ..."; sleep 2; done
   with_items:
     - 'kube-apiserver'
-    - 'kube-controller-mananger'
+    - 'kube-controller-manager'
     - 'kube-scheduler'
 
 # TODO master其他节点同步证书并且进行初始化安装
