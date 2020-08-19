@@ -6,8 +6,13 @@
 ### 协作约定
 
 ``` bash
+# redhat
 yum install -y gcc python36-devel openssl-devel
 yum install -y sshpass openssh-clients
+
+# ubuntu
+apt install -y python3-pip
+apt install -y sshpass
 
 # 保存当前类库
 # pip3 freeze > requirementes.txt
