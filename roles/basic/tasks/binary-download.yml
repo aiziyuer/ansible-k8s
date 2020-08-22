@@ -1,57 +1,57 @@
 ---
-
 - name: ensures dirs
   file: path={{ item }} state=directory
   with_items:
-   - /tmp/repository
+    - /tmp/repository
 
-- name: handle sysctl.conf
+- name: disable ipv6 by sysctl
   sysctl:
     name: "{{ item.name }}"
     value: "{{ item.value }}"
     state: present
+  when:
+    - disable_ipv6 | default('true') | bool
   with_items:
-    - { name: 'net.ipv6.conf.all.disable_ipv6', value: '1' }
-    - { name: 'net.ipv6.conf.default.disable_ipv6', value: '1' }
-    - { name: 'net.ipv6.conf.lo.disable_ipv6', value: '1' }
+    - { name: "net.ipv6.conf.all.disable_ipv6", value: "1" }
+    - { name: "net.ipv6.conf.default.disable_ipv6", value: "1" }
+    - { name: "net.ipv6.conf.lo.disable_ipv6", value: "1" }
 
 - name: download all
   shell: |
     while echo '{{ item.sha256sum }} {{ item.dest }}' | sha256sum --check --status &>/dev/null; [ $? -ne 0 ]; do curl -sSL {{ item.url }} -o {{ item.dest }}; done
   with_items:
-   - { 
-       dest: '/tmp/repository/docker_v{{ docker_version }}_linux_adm64.tgz', 
-       sha256sum: "82a362af7689038c51573e0fd0554da8703f0d06f4dfe95dd5bda5acf0ae45fb",
-       url: "https://download.docker.com/linux/static/stable/x86_64/docker-{{ docker_version }}.tgz" 
-     }
-   - { 
-       dest: '/tmp/repository/cfssl_v{{ cfssl_version }}_linux_amd64',
-       sha256sum: "d01a26bc88851aab4c986e820e7b3885cedf1316a9c26a98fbba83105cfd7b87",
-       url: "https://github.com/cloudflare/cfssl/releases/download/v{{ cfssl_version }}/cfssl_{{ cfssl_version }}_linux_amd64"  
-     }
-   - { 
-       dest: '/tmp/repository/cfssljson_v{{ cfssl_version }}_linux_amd64',
-       sha256sum: "05d67e05cacb8b2e78e737637acdcf9127b0732f0c4104403e9e9b74032fd685",
-       url: "https://github.com/cloudflare/cfssl/releases/download/v{{ cfssl_version }}/cfssljson_{{ cfssl_version }}_linux_amd64"
-     }
-   - { 
-       dest: '/tmp/repository/etcd_{{ etcd_version }}_linux_amd64.tar.gz',
-       sha256sum: "bcab421f6bf4111accfceb004e0a0ac2bcfb92ac93081d9429e313248dd78c41",
-       url: "https://github.com/etcd-io/etcd/releases/download/{{ etcd_version }}/etcd-{{ etcd_version }}-linux-amd64.tar.gz" 
-     }
-   - { 
-       dest: '/tmp/repository/kubernetes-server_{{ kubernetes_version }}_linux_amd64.tar.gz',
-       sha256sum: "199a3d8528e937de6d66071c4879e9b25e93a745cfec2bed7263db75a51d628b",
-       url: "https://dl.k8s.io/{{ kubernetes_version }}/kubernetes-server-linux-amd64.tar.gz" 
-     }
-   - { 
-       dest: '/tmp/repository/kubernetes-node_{{ kubernetes_version }}_linux_amd64.tar.gz',
-       sha256sum: "9f85620d99037486f325247c6cf35d2bd7138bb24f2fdc42158db7aed53515cd",
-       url: "https://dl.k8s.io/{{ kubernetes_version }}/kubernetes-node-linux-amd64.tar.gz" 
-     }
-   - { 
-       dest: '/tmp/repository/cni-plugins_{{ kubernetes_cni_version }}_linux_amd64.tgz',
-       sha256sum: "994fbfcdbb2eedcfa87e48d8edb9bb365f4e2747a7e47658482556c12fd9b2f5",
-       url: "https://github.com/containernetworking/plugins/releases/download/{{ kubernetes_cni_version }}/cni-plugins-linux-amd64-{{ kubernetes_cni_version }}.tgz" 
-     }
-
+    - {
+        dest: "/tmp/repository/docker_v{{ docker_version }}_linux_adm64.tgz",
+        sha256sum: "82a362af7689038c51573e0fd0554da8703f0d06f4dfe95dd5bda5acf0ae45fb",
+        url: "https://download.docker.com/linux/static/stable/x86_64/docker-{{ docker_version }}.tgz",
+      }
+    - {
+        dest: "/tmp/repository/cfssl_v{{ cfssl_version }}_linux_amd64",
+        sha256sum: "d01a26bc88851aab4c986e820e7b3885cedf1316a9c26a98fbba83105cfd7b87",
+        url: "https://github.com/cloudflare/cfssl/releases/download/v{{ cfssl_version }}/cfssl_{{ cfssl_version }}_linux_amd64",
+      }
+    - {
+        dest: "/tmp/repository/cfssljson_v{{ cfssl_version }}_linux_amd64",
+        sha256sum: "05d67e05cacb8b2e78e737637acdcf9127b0732f0c4104403e9e9b74032fd685",
+        url: "https://github.com/cloudflare/cfssl/releases/download/v{{ cfssl_version }}/cfssljson_{{ cfssl_version }}_linux_amd64",
+      }
+    - {
+        dest: "/tmp/repository/etcd_{{ etcd_version }}_linux_amd64.tar.gz",
+        sha256sum: "bcab421f6bf4111accfceb004e0a0ac2bcfb92ac93081d9429e313248dd78c41",
+        url: "https://github.com/etcd-io/etcd/releases/download/{{ etcd_version }}/etcd-{{ etcd_version }}-linux-amd64.tar.gz",
+      }
+    - {
+        dest: "/tmp/repository/kubernetes-server_{{ kubernetes_version }}_linux_amd64.tar.gz",
+        sha256sum: "199a3d8528e937de6d66071c4879e9b25e93a745cfec2bed7263db75a51d628b",
+        url: "https://dl.k8s.io/{{ kubernetes_version }}/kubernetes-server-linux-amd64.tar.gz",
+      }
+    - {
+        dest: "/tmp/repository/kubernetes-node_{{ kubernetes_version }}_linux_amd64.tar.gz",
+        sha256sum: "9f85620d99037486f325247c6cf35d2bd7138bb24f2fdc42158db7aed53515cd",
+        url: "https://dl.k8s.io/{{ kubernetes_version }}/kubernetes-node-linux-amd64.tar.gz",
+      }
+    - {
+        dest: "/tmp/repository/cni-plugins_{{ kubernetes_cni_version }}_linux_amd64.tgz",
+        sha256sum: "994fbfcdbb2eedcfa87e48d8edb9bb365f4e2747a7e47658482556c12fd9b2f5",
+        url: "https://github.com/containernetworking/plugins/releases/download/{{ kubernetes_cni_version }}/cni-plugins-linux-amd64-{{ kubernetes_cni_version }}.tgz",
+      }

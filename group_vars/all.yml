@@ -1,4 +1,8 @@
 
+
+# 由于当前国内环境复杂, ipv6的国外网站基本没法用, 所以这里默认上来就禁用掉避免麻烦
+disable_ipv6: true
+
 # binary software version
 docker_version: 18.09.9
 kubernetes_version: v1.16.3
