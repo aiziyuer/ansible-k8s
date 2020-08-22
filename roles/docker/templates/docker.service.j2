@@ -10,8 +10,8 @@ Environment=GOTRACEBACK=crash
 Environment=DOCKER_HTTP_HOST_COMPAT=1
 Environment=PATH=/usr/local/bin:/usr/bin:/usr/sbin
 ExecStart=/usr/local/bin/dockerd \
-          --add-runtime docker-runc=/usr/local/bin/docker-runc \
-          --default-runtime=docker-runc \
+          --add-runtime docker-runc=/usr/local/bin/runc \
+          --default-runtime=runc \
           --userland-proxy-path=/usr/local/bin/docker-proxy \
           --init-path=/usr/local/bin/docker-init \
           --seccomp-profile=/etc/docker/seccomp.json \
