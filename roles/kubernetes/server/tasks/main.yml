@@ -25,7 +25,7 @@
     # 限定只在首节点运行
     - groups['master'][0] == inventory_hostname
   include_tasks:
-    file: generate_kubeadm_join_command.yml
+    file: kubeadm_join.yml
     apply:
       tags:
         - node
