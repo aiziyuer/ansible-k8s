@@ -1,5 +1,5 @@
 ---
-- name: name: ensures dirs
+- name: ensures dirs
   file: path={{ item }} state=directory
   with_items:
     - /usr/local/bin

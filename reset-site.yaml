@@ -1,21 +1,32 @@
 ---
-
 - hosts: all
-  gather_facts: yes
+  gather_facts: no
   become: yes
   tasks:
     - name: kubeadm reset
       shell: "kubeadm reset --force"
       ignore_errors: True
-    
+
+    - name: remove flannel interface
+      command: ifconfig flannel.1 down
+      ignore_errors: True
+
     - name: remove flannel interface
       command: ip link delete flannel.1
       ignore_errors: True
-    
+
+    - name: remove cni0 bridge
+      command: ifconfig cni0 down
+      ignore_errors: True
+
     - name: remove cni0 bridge
       command: ip link delete cni0
       ignore_errors: True
-    
+
+- hosts: master
+  gather_facts: no
+  become: yes
+  tasks:
     - name: clean etcd
       shell: |
         systemctl stop etcd

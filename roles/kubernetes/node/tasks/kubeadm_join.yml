@@ -1,0 +1,31 @@
+---
+- name: ensures dirs
+  file: path={{ item }} state=directory
+  with_items:
+    - /usr/local/bin
+
+- name: handle kubernetes-server
+  unarchive:
+    src: "/tmp/repository/kubernetes-node_{{ kubernetes_version }}_linux_amd64.tar.gz"
+    dest: "/usr/local/bin"
+    remote_src: yes
+    extra_opts:
+      - --strip=3
+    exclude:
+      - "*.tar"
+      - "*.docker_tag"
+
+- name: clean env
+  shell: |
+    kubeadm reset --force || true; 
+    ifconfig flannel.1 down; ip link delete flannel.1 || true; 
+    ifconfig cni0 down; ip link delete cni0 || true;
+    rm -rf /var/lib/cni || true;
+  register: var_output
+# - debug: var=var_output
+
+- name: join to kubernetes
+  shell: |
+    {{ kubeadm_join_command }}
+  register: var_output
+- debug: var=var_output

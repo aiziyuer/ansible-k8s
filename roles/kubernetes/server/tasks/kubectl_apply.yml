@@ -20,11 +20,10 @@
 
 - name: kubectl apply -f xxx
   shell: |
-    cd {{ lookup('env', 'HOME') }}/.kube/install
     # export KUBECONFIG=/etc/kubernetes/admin.conf
     while kubectl apply -f {{ item }} &>/dev/null; [ $? -ne 0 ]; do echo "kubectl apply -f {{ item }} ..."; sleep 2; done
   with_items:
-    - kube-flannel.yml
+    - "{{ lookup('env', 'HOME') }}/.kube/install/kube-flannel.yml"
 
 - name: wait app ready with lables
   when:

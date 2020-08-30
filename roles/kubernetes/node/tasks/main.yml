@@ -1,0 +1,6 @@
+---
+
+# - name: check kubectl.conf exists
+
+- name: kubeadm join ...
+  include_tasks: kubeadm_join.yml
