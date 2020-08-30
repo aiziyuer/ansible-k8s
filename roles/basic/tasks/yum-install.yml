@@ -16,6 +16,7 @@
       - unzip
       - gzip
       - tar
+      - tree
       - git
       - zsh
       - jq

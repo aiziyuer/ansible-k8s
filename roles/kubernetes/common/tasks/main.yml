@@ -1,10 +1,9 @@
 ---
-
-- name: ensures kuberentes node dirs
+- name: ensures dirs
   file: path={{ item }} state=directory
   with_items:
-   - /etc/systemd/system
-   - /etc/kuberentes/mainifest
+    - /etc/systemd/system
+    - /etc/kuberentes/mainifest
 
 - name: disable system swap
   shell: "swapoff -a"
@@ -20,7 +19,7 @@
 - name: add kernel modules
   modprobe:
     name: "{{ item }}"
-    satte: present
+    state: present
   ignore_errors: true
   with_items:
     - ip_vs
@@ -36,41 +35,40 @@
     value: "{{ item.value }}"
     state: present
   with_items:
-    - { name: 'vm.swappiness', value: '0' }
-    - { name: 'net.bridge.bridge-nf-call-iptables', value: '1' }
-    - { name: 'net.bridge.bridge-nf-call-ip6tables', value: '1' }
-    - { name: 'net.ipv4.ip_forward', value: '1' }
+    - { name: "vm.swappiness", value: "0" }
+    - { name: "net.bridge.bridge-nf-call-iptables", value: "1" }
+    - { name: "net.bridge.bridge-nf-call-ip6tables", value: "1" }
+    - { name: "net.ipv4.ip_forward", value: "1" }
 
 - name: disable invalid service config
   shell: |
-   rm -rf /etc/systemd/system/kubelet.service.d || true
-   rm -rf /usr/lib/systemd/system/kubelet.service || true
-   rm -rf /usr/lib/systemd/system/kubelet.service.d || true
+    rm -rf /etc/systemd/system/kubelet.service.d || true
+    rm -rf /usr/lib/systemd/system/kubelet.service || true
+    rm -rf /usr/lib/systemd/system/kubelet.service.d || true
 
 - name: get docker cgroup driver
   shell: |
     docker info 2>/dev/null | sed -n 's/Cgroup Driver:\s\+\(\S\+\)/\1/p'
   register: docker_cgroup_driver
 
-- set_fact:
-    docker_cgroup_driver={{ docker_cgroup_driver.stdout | default('cgroupfs') }}
+- set_fact: docker_cgroup_driver={{ docker_cgroup_driver.stdout | default('cgroupfs') }}
 
 - name: add kubelet services
   template: src={{ item.src }} dest={{ item.dest }} mode=0644
   with_items:
-    - { src: kubelet.service.j2, dest: '/etc/systemd/system/kubelet.service' }
+    - { src: kubelet.service.j2, dest: "/etc/systemd/system/kubelet.service" }
 
 - name: handle kubernetes-node
   when: "'master' in group_names"
-  unarchive: 
-   src: "/tmp/repository/kubernetes-node_{{ kubernetes_version }}_linux_amd64.tar.gz"
-   dest: '/usr/local/bin'
-   remote_src: yes
-   extra_opts: 
+  unarchive:
+    src: "/tmp/repository/kubernetes-node_{{ kubernetes_version }}_linux_amd64.tar.gz"
+    dest: "/usr/local/bin"
+    remote_src: yes
+    extra_opts:
       - --strip=3
-   exclude:
-    - '*.tar'
-    - '*.docker_tag'
+    exclude:
+      - "*.tar"
+      - "*.docker_tag"
 
 - name: handle kubelet services
   systemd:

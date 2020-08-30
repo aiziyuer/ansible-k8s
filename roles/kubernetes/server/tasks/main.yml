@@ -1,21 +1,12 @@
 ---
-- name: ensures kubernetes server dirs
-  file: path={{ item }} state=directory
-  with_items:
-    - /etc/systemd/system
-    - /etc/kuberentes/mainifest
-    - /usr/local/bin
-    - "{{ lookup('env', 'HOME') }}/k8s"
-    - "{{ lookup('env', 'HOME') }}/.kube"
 
 - name: check if kubadm installed or not
   stat:
     path: "/etc/kubernetes/admin.conf"
   register: var_kubeadm_conf
-- debug: var=var_kubeadm_conf
 
 # 重置: ansible-playbook -i inventory reset-site.yaml
-- name: kubeadm init start ...
+- name: kubeadm init ...
   include_tasks: kubeadm_init.yml
   when:
     - (groups['master'] | length > 0)
@@ -23,3 +14,9 @@
 
 - name: kubectl bash completion
   include_tasks: kubectl_completion.yml
+
+- name: kubectl apply ...
+  when:
+   # 限定只在首节点运行
+   - groups['master'][0] == inventory_hostname
+  include_tasks: kubectl_apply.yml

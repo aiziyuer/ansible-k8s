@@ -6,3 +6,4 @@ MarkupSafe==1.1.1
 pycparser==2.19
 PyYAML==5.1.2
 six==1.13.0
+jmespath==0.10.0

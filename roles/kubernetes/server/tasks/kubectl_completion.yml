@@ -10,7 +10,7 @@
 
 - name: add bash-completion to ~/.bashrc for kubectl
   lineinfile:
-    dest: /root/.bashrc
+    dest: "{{ lookup('env', 'HOME') }}/.bashrc"
     regexp: "^source <(kubectl completion bash)$"
     line: source <(kubectl completion bash)
     state: present
