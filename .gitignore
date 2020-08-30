@@ -5,5 +5,6 @@ log/*
 .vagrant
 __pychache__
 *.pyc
-.vscode
+.vscode/*
+!.vscode/settings.json
 inventory/dev
