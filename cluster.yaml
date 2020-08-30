@@ -4,11 +4,6 @@
   become: yes
   roles:
     - { role: basic, tags: basic }
-
-- hosts: kubernetes
-  gather_facts: yes
-  become: yes
-  roles:
     - { role: docker, tags: docker }
 
 - hosts: master
@@ -16,10 +11,4 @@
   become: yes
   roles:
     - { role: etcd, tags: etcd }
-    - { role: kubernetes/server, tags: master }
-
-- hosts: node
-  gather_facts: yes
-  become: yes
-  roles:
-    - { role: kubernetes/node, tags: node }
+    - { role: kubernetes/server, tags: k8s-master }

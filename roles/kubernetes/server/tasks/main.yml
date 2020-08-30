@@ -1,56 +1,23 @@
 ---
-
 - name: ensures kubernetes server dirs
   file: path={{ item }} state=directory
   with_items:
-   - /etc/systemd/system
-   - /etc/kuberentes/mainifest
-   - /usr/local/bin
-   - "{{ lookup('env', 'HOME') }}/k8s"
-   - "{{ lookup('env', 'HOME') }}/.kube"
+    - /etc/systemd/system
+    - /etc/kuberentes/mainifest
+    - /usr/local/bin
+    - "{{ lookup('env', 'HOME') }}/k8s"
+    - "{{ lookup('env', 'HOME') }}/.kube"
 
-- name: handle kubernetes-server
-  when: "'master' in group_names"
-  unarchive: 
-   src: "/tmp/repository/kubernetes-server_{{ kubernetes_version }}_linux_amd64.tar.gz"
-   dest: '/usr/local/bin'
-   remote_src: yes
-   extra_opts: 
-      - --strip=3
-   exclude:
-    - '*.tar'
-    - '*.docker_tag'
+- name: check if kubadm installed or not
+  stat:
+    path: "/etc/kubernetes/admin.conf"
+  register: var_kubeadm_conf
+- debug: var=var_kubeadm_conf
 
-- name: genrate kubeadmcfg
-  template: src={{ item.src }} dest={{ item.dest }}
-  with_items:
-  - { src: "kubeadmcfg.yml.j2", dest: "/root/k8s/kubeadmcfg.yml" }
-
-- name: kubeadm init
-  when: groups['master'][0] == inventory_hostname
-  shell: |
-   cd /root/k8s
-   kubeadm init --config=kubeadmcfg.yml
-  register: kubeadm_init
-- debug: var=kubeadm_init
-
-- name: copy admin.conf to ~/.kube/config
-  copy:
-   src: "/etc/kubernetes/admin.conf"
-   dest: "{{ lookup('env', 'HOME') }}/.kube/config"
-   owner: "{{ ansible_user | default(ansible_user_id) }}"
-   group: "{{ ansible_user | default(ansible_user_id) }}"
-   mode: 0755
-   remote_src: true
-
-- name: wait cluster first node ready
-  when: groups['master'][0] == inventory_hostname
-  shell: |
-    while kubectl -n kube-system get pods --field-selector=status.phase==Running 2>&1 | grep '{{ item }}' >/dev/null; [ $? -ne 0 ]; do echo "wait for pods: {{ item}} ..."; sleep 2; done
-  with_items:
-    - 'kube-apiserver'
-    - 'kube-controller-manager'
-    - 'kube-scheduler'
-
-# TODO master其他节点同步证书并且进行初始化安装
+# 重置: ansible-playbook -i inventory reset-site.yaml
+- name: step 1 kubeadm init start ...
+  when:
+   - (groups['master'] | length > 0)
+   - not var_kubeadm_conf.stat.exists
+  include_tasks: 01-kubeadm_init.yaml
 
