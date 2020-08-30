@@ -15,9 +15,11 @@
 - debug: var=var_kubeadm_conf
 
 # 重置: ansible-playbook -i inventory reset-site.yaml
-- name: step 1 kubeadm init start ...
+- name: kubeadm init start ...
+  include_tasks: kubeadm_init.yml
   when:
-   - (groups['master'] | length > 0)
-   - not var_kubeadm_conf.stat.exists
-  include_tasks: 01-kubeadm_init.yaml
+    - (groups['master'] | length > 0)
+    - not var_kubeadm_conf.stat.exists
 
+- name: kubectl bash completion
+  include_tasks: kubectl_completion.yml

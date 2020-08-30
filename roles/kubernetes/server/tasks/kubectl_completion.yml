@@ -1,0 +1,16 @@
+---
+- name: install packages
+  when:
+    - ansible_os_family == "RedHat"
+  yum:
+    state: present
+    # update_cache: yes
+    name:
+      - bash-completion
+
+- name: add bash-completion to ~/.bashrc for kubectl
+  lineinfile:
+    dest: /root/.bashrc
+    regexp: "^source <(kubectl completion bash)$"
+    line: source <(kubectl completion bash)
+    state: present
