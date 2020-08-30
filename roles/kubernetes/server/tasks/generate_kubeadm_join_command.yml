@@ -1,0 +1,11 @@
+---
+- name: generate kubeadm_join_command
+  shell: |
+    kubeadm token create --ttl 30m --print-join-command
+  register: var_kubeadm_join_command
+- name: export kubeadm_join_command
+  set_fact:
+    kubeadm_join_command: "{{ var_kubeadm_join_command.stdout }}"
+  delegate_to: "{{ item }}"
+  delegate_facts: true
+  with_items: "{{ groups['node'] }}"

@@ -13,33 +13,6 @@
     - { role: etcd, tags: etcd }
     - { role: kubernetes/server, tags: master }
 
-- hosts: master[0]
-  gather_facts: yes
-  become: yes
-  tasks:
-    - name: generate kubeadm_join_command
-      shell: |
-        kubeadm token create --ttl 30m --print-join-command
-      register: var_kubeadm_join_command
-      tags:
-        - node
-    - name: export kubeadm_join_command
-      set_fact:
-        kubeadm_join_command: "{{ var_kubeadm_join_command.stdout }}"
-      delegate_to: "{{ item }}"
-      delegate_facts: true
-      tags:
-        - node
-      with_items: "{{ groups['node'] }}"
-
-# - hosts: node
-#   gather_facts: yes
-#   become: yes
-#   tasks:
-#     - debug: var=kubeadm_join_command
-#       tags:
-#         - node
-
 - hosts: node
   gather_facts: yes
   become: yes

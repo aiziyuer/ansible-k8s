@@ -1,5 +1,4 @@
 ---
-
 - name: check if kubadm installed or not
   stat:
     path: "/etc/kubernetes/admin.conf"
@@ -17,6 +16,18 @@
 
 - name: kubectl apply ...
   when:
-   # 限定只在首节点运行
-   - groups['master'][0] == inventory_hostname
+    # 限定只在首节点运行
+    - groups['master'][0] == inventory_hostname
   include_tasks: kubectl_apply.yml
+
+- name: generate kubeadm join command ...
+  when:
+    # 限定只在首节点运行
+    - groups['master'][0] == inventory_hostname
+  include_tasks:
+    file: generate_kubeadm_join_command.yml
+    apply:
+      tags:
+        - node
+  tags:
+    - always

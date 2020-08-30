@@ -3,7 +3,7 @@
   file: path={{ item }} state=directory
   with_items:
     - /usr/local/bin
-    - "{{ lookup('env', 'HOME') }}/.kube"
+    - "{{ lookup('env', 'HOME') }}/.kube/install"
 
 - name: handle kubernetes-server
   unarchive:
@@ -16,10 +16,12 @@
       - "*.tar"
       - "*.docker_tag"
 
-- name: genrate kubeadmcfg
-  template: src={{ item.src }} dest={{ item.dest }}
-  with_items:
-    - { src: "kubeadmcfg.yml.j2", dest: "/root/.kube/kubeadmcfg.yml" }
+- name: prepare apps
+  # debug: var=item
+  template: src={{ item.src }} dest="{{ lookup('env', 'HOME') }}/{{ item.path | regex_replace('\.j2$', '') }}"
+  with_filetree:
+    - "../templates/"
+  when: item.state == 'file'
 
 - name: kubeadm init
   when:
@@ -27,7 +29,7 @@
     - not var_kubeadm_conf.stat.exists
   shell: |
     cd /root/k8s
-    kubeadm init --config=.kube/kubeadmcfg.yml
+    kubeadm init --config=.kube/install/kubeadmcfg.yml
   register: kubeadm_init
 - debug: var=kubeadm_init
 
