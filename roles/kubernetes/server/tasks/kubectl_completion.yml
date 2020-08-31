@@ -13,3 +13,9 @@
     dest: "{{ lookup('env', 'HOME') }}/.bashrc"
     line: "source <(kubectl completion bash)"
     state: present
+
+- name: add bash-completion to ~/.bashrc for kubectl
+  lineinfile:
+    dest: "{{ lookup('env', 'HOME') }}/.bashrc"
+    line: "source <(kubeadm completion bash)"
+    state: present
