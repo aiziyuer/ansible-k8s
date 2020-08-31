@@ -31,3 +31,9 @@
         - node
   tags:
     - always
+
+- name: install helm ...
+  when:
+    # 限定只在首节点运行
+    - (groups['master'] | length > 0)
+  include_tasks: helm.yml

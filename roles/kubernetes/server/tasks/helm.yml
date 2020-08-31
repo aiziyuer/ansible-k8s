@@ -1,0 +1,21 @@
+---
+- name: install helm cli
+  unarchive: 
+   src: "/tmp/repository/helm-canary-linux-amd64.tar.gz"
+   dest: '/usr/local/bin'
+   remote_src: yes
+   extra_opts: 
+    - --strip-components=1
+   exclude:
+    - 'LICENSE'
+    - 'README.md'
+
+- name: add bash-completion to ~/.bashrc for helm
+  lineinfile:
+    dest: "{{ lookup('env', 'HOME') }}/.bashrc"
+    line: "source <(helm completion bash)"
+    state: present
+
+- name: 
+  shell: |
+    helm repo add stable https://kubernetes-charts.storage.googleapis.com/
