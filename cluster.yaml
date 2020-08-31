@@ -3,6 +3,7 @@
   gather_facts: yes
   become: yes
   roles:
+    - { role: hack, tags: hack }
     - { role: basic, tags: basic }
     - { role: docker, tags: docker }
 

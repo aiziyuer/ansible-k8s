@@ -1,0 +1,12 @@
+---
+- name: custom sshd_config
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?\w*{{ item.key }}\s'
+    line: "{{ item.key }} {{ item.value }}"
+    validate: "/usr/sbin/sshd -T -f %s"
+  with_items:
+    - { key: MaxSessions, value: 3000 }
+    - { key: Subsystem, value: "sftp /usr/libexec/openssh/sftp-server" }
+    - { key: UseDNS, value: "no" }
+  notify: restart sshd
