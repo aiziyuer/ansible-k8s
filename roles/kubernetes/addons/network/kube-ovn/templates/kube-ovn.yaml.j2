@@ -39,7 +39,7 @@ spec:
       hostNetwork: true
       containers:
         - name: kube-ovn-controller
-          image: 'kubeovn/kube-ovn:{{ vars["kube-ovn_version"] }}
+          image: "kubeovn/kube-ovn:{{ vars["kube-ovn_version"] }}"
           imagePullPolicy: IfNotPresent
           command:
           - /kube-ovn/start-controller.sh
