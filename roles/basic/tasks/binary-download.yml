@@ -60,3 +60,8 @@
         sha256sum: "cb19f9dc6a7f023a26d5e6167cf4ca2760c2eff9ea4c7e78d8f087aa2828374d",
         url: "https://get.helm.sh/helm-canary-linux-amd64.tar.gz",
       }
+    - {
+        dest: "/tmp/repository/kubectl-ko",
+        sha256sum: "b2216939a08575cf547ad1e7d7df833ecbdc787769496bdaf4b7102183263c00",
+        url: "https://raw.githubusercontent.com/alauda/kube-ovn/release-1.4/dist/images/kubectl-ko",
+      }

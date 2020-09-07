@@ -24,6 +24,11 @@
     - "{{ lookup('env', 'HOME') }}/.kube/install/addons/network/ovn.yaml"
     - "{{ lookup('env', 'HOME') }}/.kube/install/addons/network/kube-ovn.yaml"
 
+- name: copy binaries
+  copy: remote_src=yes src={{ item.src }} dest={{ item.dest | default("/usr/local/bin") }} mode=0755
+  with_items:
+   - { src: "/tmp/repository/kubectl-ko", dest: '/usr/local/bin/kubectl-ko'}
+
 # - name: wait app ready with lables
 #   when:
 #     - true | bool

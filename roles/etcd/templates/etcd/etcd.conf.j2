@@ -29,7 +29,7 @@ ETCD_LISTEN_CLIENT_URLS="http://0.0.0.0:2379,http://0.0.0.0:4001"
 #[Clustering]
 ETCD_INITIAL_ADVERTISE_PEER_URLS="https://{{ inventory_hostname }}:2380"
 ETCD_ADVERTISE_CLIENT_URLS="https://{{ inventory_hostname }}:2379,http://{{ inventory_hostname }}:4001"
-ETCD_INITIAL_CLUSTER="{{ groups['master'] | map('regex_replace', '^(?P<hostname>.+)$', '\g<hostname=https://\g<hostname>:2380') | join(',') }}"
+ETCD_INITIAL_CLUSTER="{{ groups['master'] | map('regex_replace', '^(?P<hostname>.+)$', '\g<hostname>=https://\g<hostname>:2380') | join(',') }}"
 ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
 ETCD_INITIAL_CLUSTER_STATE="new"
 ETCD_STRICT_RECONFIG_CHECK="true"
