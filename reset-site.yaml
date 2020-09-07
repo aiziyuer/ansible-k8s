@@ -4,24 +4,22 @@
   become: yes
   tasks:
     - name: kubeadm reset
-      shell: "kubeadm reset --force"
+      shell: |
+        kubeadm reset --force;
       ignore_errors: True
 
-    - name: remove flannel interface
-      command: ifconfig flannel.1 down
+    - name: remvoe interface
+      shell: |
+        kubeadm reset --force;
+        ifconfig {{ item }} down;
+        ip link delete {{ item }};
       ignore_errors: True
-
-    - name: remove flannel interface
-      command: ip link delete flannel.1
-      ignore_errors: True
-
-    - name: remove cni0 bridge
-      command: ifconfig cni0 down
-      ignore_errors: True
-
-    - name: remove cni0 bridge
-      command: ip link delete cni0
-      ignore_errors: True
+      with_items:
+        - flannel.1
+        - cni0
+        - genev_sys_6081
+        - mirror0
+        - ovn0
 
 - hosts: master
   gather_facts: no

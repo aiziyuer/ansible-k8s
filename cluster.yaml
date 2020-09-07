@@ -13,10 +13,15 @@
   roles:
     - { role: etcd, tags: etcd }
     - { role: kubernetes/server, tags: master }
-    - { role: "kubernetes/addons/network", tags: addons-network }
 
 - hosts: node
   gather_facts: yes
   become: yes
   roles:
     - { role: kubernetes/node, tags: node }
+
+- hosts: master
+  gather_facts: yes
+  become: yes
+  roles:
+    - { role: "kubernetes/addons/network", tags: addons-network }

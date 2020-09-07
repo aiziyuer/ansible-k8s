@@ -21,7 +21,7 @@ Environment="KUBELET_CONFIG_ARGS=--config=/var/lib/kubelet/config.yaml"
 EnvironmentFile=-/var/lib/kubelet/kubeadm-flags.env
 # This is a file that the user can use for overrides of the kubelet args as a last resort. Preferably, the user should use
 # the .NodeRegistration.KubeletExtraArgs object in the configuration files instead. KUBELET_EXTRA_ARGS should be sourced from this file.
-Environment="KUBELET_DNS_ARGS=--cluster-dns={{ service_cidr | default('10.96.0.10') | regex_replace('^(?P<prefix>(?:\d{1,3}\.){3}).+$', '\g<prefix>10') }} --cluster-domain={{ cluster_domain | default('cluster.local') }}"
+Environment="KUBELET_DNS_ARGS={% if 'flannel' not in addons_network %}--network-plugin=cni{% endif %} --cluster-dns={{ service_cidr | default('10.96.0.10') | regex_replace('^(?P<prefix>(?:\d{1,3}\.){3}).+$', '\g<prefix>10') }} --cluster-domain={{ cluster_domain | default('cluster.local') }}"
 Environment="KUBELET_CGROUP_ARGS=--cgroup-driver={{ docker_cgroup_driver | default("cgroupfs") | trim }}"
 EnvironmentFile=-/etc/sysconfig/kubelet
 {% endif -%}
