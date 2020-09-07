@@ -15,7 +15,7 @@ gluster_version: 4.1.9
 # network plugin(options: flannel, kube-ovn)
 addons_network: flannel
 flannel_version: v0.12.0
-kube-ovn: v1.4
+kube-ovn_version: v1.4.0
 
 # kubernete configuration
 # eg. token: b0f7b8.8d1767879297d85c

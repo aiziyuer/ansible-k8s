@@ -39,13 +39,13 @@ spec:
       hostNetwork: true
       containers:
         - name: kube-ovn-controller
-          image: "kubeovn/kube-ovn:v1.4.0"
+          image: "kubeovn/kube-ovn:{{ kube-ovn_version }}"
           imagePullPolicy: IfNotPresent
           command:
           - /kube-ovn/start-controller.sh
           args:
-          - --default-cidr=10.16.0.0/16
-          - --default-gateway=10.16.0.1
+          - --default-cidr={{ pod_network_cidr }}
+          - --default-gateway={{ pod_network_cidr | regex_replace('^(?P<prefix>(?:\d{1,3}\.){3}).+$', '\g<prefix>1') }}
           - --node-switch-cidr=100.64.0.0/16
           env:
             - name: POD_NAME
@@ -110,7 +110,7 @@ spec:
       hostPID: true
       initContainers:
       - name: install-cni
-        image: "kubeovn/kube-ovn:v1.4.0"
+        image: "kubeovn/kube-ovn:{{ kube-ovn_version }}"
         imagePullPolicy: IfNotPresent
         command: ["/kube-ovn/install-cni.sh"]
         securityContext:
@@ -123,7 +123,7 @@ spec:
             name: cni-bin
       containers:
       - name: cni-server
-        image: "kubeovn/kube-ovn:v1.4.0"
+        image: "kubeovn/kube-ovn:{{ kube-ovn_version }}"
         imagePullPolicy: IfNotPresent
         command:
           - sh
@@ -218,7 +218,7 @@ spec:
       hostPID: true
       containers:
         - name: pinger
-          image: "kubeovn/kube-ovn:v1.4.0"
+          image: "kubeovn/kube-ovn:{{ kube-ovn_version }}"
           command: ["/kube-ovn/kube-ovn-pinger", "--external-address=114.114.114.114", "--external-dns=alauda.cn"]
           imagePullPolicy: IfNotPresent
           securityContext:
