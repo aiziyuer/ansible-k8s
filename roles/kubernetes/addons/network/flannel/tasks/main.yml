@@ -1,0 +1,33 @@
+---
+- name: ensures dirs
+  file: path={{ item }} state=directory
+  with_items:
+    - "{{ lookup('env', 'HOME') }}/.kube/install/addons/network/"
+
+- name: prepare apps
+  # debug: var=item
+  template: src={{ item.src }} dest="{{ lookup('env', 'HOME') }}/.kube/install/addons/network/{{ item.path | regex_replace('\.j2$', '') }}"
+  with_filetree:
+    - "../templates/"
+  when: item.state == 'file'
+
+- name: kubectl apply -f xxx
+  shell: |
+    # export KUBECONFIG=/etc/kubernetes/admin.conf
+    while kubectl apply -f {{ item }} &>/dev/null; [ $? -ne 0 ]; do echo "kubectl apply -f {{ item }} ..."; sleep 2; done
+  with_items:
+    - "{{ lookup('env', 'HOME') }}/.kube/install/addons/network/kube-flannel.yml"
+
+# - name: wait app ready with lables
+#   when:
+#     - true | bool
+#   shell: |
+#     kubectl get pods \
+#             {{ "--namespace " ~ item.ns | default('kube-system') }} \
+#             {{ "--selector " ~ item.l if item.l is defined }} \
+#             {{ item.pod | default('') }} \
+#             -o json 
+#   register: kubectl_get_pods
+#   until: kubectl_get_pods.stdout | from_json | json_query('items[*].status.phase') | unique == ["Running"]
+#   with_items:
+#     - { l: "k8s-app=kube-dns" }

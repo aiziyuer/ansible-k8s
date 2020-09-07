@@ -1,0 +1,9 @@
+---
+
+- name: addons-network
+  include_role:
+    name: '{{ roleinputvar }}'
+  loop:
+    - "kubernetes/addons/network/{{ addons_network }}"
+  loop_control:
+    loop_var: roleinputvar

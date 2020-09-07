@@ -11,8 +11,11 @@ cfssl_version: 1.4.1
 etcd_version: v3.4.9
 gluster_version: 4.1.9
 
-# docker software version
+# ------------ addons ------------------------------
+# network plugin(options: flannel, kube-ovn)
+addons_network: flannel
 flannel_version: v0.12.0
+kube-ovn: v1.4
 
 # kubernete configuration
 # eg. token: b0f7b8.8d1767879297d85c
