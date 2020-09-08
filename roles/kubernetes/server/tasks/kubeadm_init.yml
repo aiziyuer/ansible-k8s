@@ -18,7 +18,7 @@
 
 - name: prepare apps
   # debug: var=item
-  template: src={{ item.src }} dest="{{ lookup('env', 'HOME') }}/{{ item.path | regex_replace('\.j2$', '') }}"
+  template: src={{ item.src }} dest="{{ lookup('env', 'HOME') }}/.kube/install/{{ item.path | regex_replace('\.j2$', '') }}"
   with_filetree:
     - "../templates/"
   when: item.state == 'file'
