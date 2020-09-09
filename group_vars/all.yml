@@ -20,7 +20,7 @@ kube-ovn_version: v1.4.0
 # kubernete configuration
 # eg. token: b0f7b8.8d1767879297d85c
 token: ffffff.ffffffffffffffff
-service_cidr: "172.28.0/16"
+service_cidr: "172.28.0.0/16"
 pod_network_cidr: "172.29.0.0/16"
 cluster_domain: "cluster.me"
 network_interface: "eth0"
