@@ -51,7 +51,7 @@
         url: "https://dl.k8s.io/{{ kubernetes_version }}/kubernetes-node-linux-amd64.tar.gz",
       }
     - {
-        dest: "/tmp/repository/cni-plugins_{{ kubernetes_cni_version }}_linux_amd64.tgz",
+        dest: "/tmp/repository/cni-plugins_linux_amd64.tgz",
         sha256sum: "994fbfcdbb2eedcfa87e48d8edb9bb365f4e2747a7e47658482556c12fd9b2f5",
         url: "https://github.com/containernetworking/plugins/releases/download/{{ kubernetes_cni_version }}/cni-plugins-linux-amd64-{{ kubernetes_cni_version }}.tgz",
       }

@@ -58,17 +58,11 @@
   with_items:
     - { src: kubelet.service.j2, dest: "/etc/systemd/system/kubelet.service" }
 
-- name: handle kubernetes-node
-  when: "'master' in group_names"
+- name: handle cni-plugins
   unarchive:
-    src: "/tmp/repository/kubernetes-node_{{ kubernetes_version }}_linux_amd64.tar.gz"
-    dest: "/usr/local/bin"
+    src: "/tmp/repository/cni-plugins_linux_amd64.tgz"
+    dest: "/opt/cni/bin"
     remote_src: yes
-    extra_opts:
-      - --strip=3
-    exclude:
-      - "*.tar"
-      - "*.docker_tag"
 
 - name: handle kubelet services
   systemd:

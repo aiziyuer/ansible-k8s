@@ -6,23 +6,22 @@ After=network-online.target
 
 [Service]
 Environment="KUBELET_KUBECONFIG_ARGS=--bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.conf"
+Environment="KUBELET_CGROUP_ARGS=--cgroup-driver={{ docker_cgroup_driver | default("cgroupfs") | trim }}"
+Environment="KUBELET_EXTRA_ARGS=--pod-infra-container-image=k8s.gcr.io/pause:3.1 --runtime-cgroups=/systemd/system.slice --kubelet-cgroups=/systemd/system.slice "
+Environment="KUBELET_DNS_ARGS={% if 'flannel' not in addons_network %}--network-plugin=cni{% endif %} --cluster-dns={{ service_cidr | default('10.96.0.10') | regex_replace('^(?P<prefix>(?:\d{1,3}\.){3}).+$', '\g<prefix>10') }} --cluster-domain={{ cluster_domain | default('cluster.local') }}"
+Environment="KUBELET_NETWORK_ARGS=--network-plugin=cni --cni-conf-dir=/etc/cni/net.d --cni-bin-dir=/opt/cni/bin"
+
 {% if kubernetes_version is version('v1.10.0', '<=') -%}
 Environment="KUBELET_SYSTEM_PODS_ARGS=--pod-manifest-path=/etc/kubernetes/manifests --allow-privileged=true"
-Environment="KUBELET_NETWORK_ARGS=--network-plugin=cni --cni-conf-dir=/etc/cni/net.d --cni-bin-dir=/opt/cni/bin"
-Environment="KUBELET_DNS_ARGS={% if 'flannel' not in addons_network %}--network-plugin=cni{% endif %} --cluster-dns={{ service_cidr | default('10.96.0.10') | regex_replace('^(?P<prefix>(?:\d{1,3}\.){3}).+$', '\g<prefix>10') }} --cluster-domain={{ cluster_domain | default('cluster.local') }}"
 Environment="KUBELET_AUTHZ_ARGS=--authorization-mode=Webhook --client-ca-file=/etc/kubernetes/pki/ca.crt"
 {# see: https://github.com/kubernetes/kubernetes/issues/56523 #}
 Environment="KUBELET_CADVISOR_ARGS=--cadvisor-port=0"
-Environment="KUBELET_CGROUP_ARGS=--cgroup-driver={{ docker_cgroup_driver | default("cgroupfs") | trim }}"
-Environment="KUBELET_EXTRA_ARGS=--pod-infra-container-image=k8s.gcr.io/pause:3.1"
 {% else %}
 Environment="KUBELET_CONFIG_ARGS=--config=/var/lib/kubelet/config.yaml"
 # This is a file that "kubeadm init" and "kubeadm join" generates at runtime, populating the KUBELET_KUBEADM_ARGS variable dynamically
 EnvironmentFile=-/var/lib/kubelet/kubeadm-flags.env
 # This is a file that the user can use for overrides of the kubelet args as a last resort. Preferably, the user should use
 # the .NodeRegistration.KubeletExtraArgs object in the configuration files instead. KUBELET_EXTRA_ARGS should be sourced from this file.
-Environment="KUBELET_DNS_ARGS={% if 'flannel' not in addons_network %}--network-plugin=cni{% endif %} --cluster-dns={{ service_cidr | default('10.96.0.10') | regex_replace('^(?P<prefix>(?:\d{1,3}\.){3}).+$', '\g<prefix>10') }} --cluster-domain={{ cluster_domain | default('cluster.local') }}"
-Environment="KUBELET_CGROUP_ARGS=--cgroup-driver={{ docker_cgroup_driver | default("cgroupfs") | trim }}"
 EnvironmentFile=-/etc/sysconfig/kubelet
 {% endif -%}
 ExecStart=
