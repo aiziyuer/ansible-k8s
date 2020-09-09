@@ -4,6 +4,7 @@
   with_items:
     - /etc/systemd/system
     - /etc/kuberentes/mainifest
+    - /opt/cni/bin
 
 - name: disable system swap
   shell: "swapoff -a"
