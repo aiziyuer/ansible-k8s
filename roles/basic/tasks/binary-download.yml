@@ -56,9 +56,9 @@
         url: "https://github.com/containernetworking/plugins/releases/download/{{ kubernetes_cni_version }}/cni-plugins-linux-amd64-{{ kubernetes_cni_version }}.tgz",
       }
     - {
-        dest: "/tmp/repository/helm-canary-linux-amd64.tar.gz",
-        sha256sum: "cb19f9dc6a7f023a26d5e6167cf4ca2760c2eff9ea4c7e78d8f087aa2828374d",
-        url: "https://get.helm.sh/helm-canary-linux-amd64.tar.gz",
+        dest: "/tmp/repository/helm-linux-amd64.tar.gz",
+        sha256sum: "81e3974927b4f76e9f679d1f6d6b45748f8c84081a571741d48b2902d816e14c",
+        url: "https://get.helm.sh/helm-v3.3.1-linux-amd64.tar.gz",
       }
     - {
         dest: "/tmp/repository/kubectl-ko",
