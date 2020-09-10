@@ -6,11 +6,19 @@
     - name: kubeadm reset
       shell: |
         kubeadm reset --force;
+        rm -rf /opt/cni/bin;
+        rm -rf /var/run/openvswitch;
+        rm -rf /var/run/ovn;
+        rm -rf /etc/origin/openvswitch;
+        rm -rf /etc/origin/ovn;
+        rm -rf /etc/cni/net.d/*
+        rm -rf /var/log/openvswitch;
+        rm -rf /var/log/ovn;
+        ipvsadm -C;
       ignore_errors: True
 
     - name: remvoe interface
       shell: |
-        kubeadm reset --force;
         ifconfig {{ item }} down;
         ip link delete {{ item }};
       ignore_errors: True
@@ -27,7 +35,23 @@
   tasks:
     - name: clean etcd
       shell: |
-        systemctl stop etcd
-        rm -rf /etc/etcd
-        rm -rf /var/lib/etcd
+        systemctl stop etcd;
+        rm -rf /etc/etcd;
+        rm -rf /var/lib/etcd;
       ignore_errors: True
+
+- hosts: all
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: reboot the server
+      shell: 'sleep1 && shutdown -r now "Reboot triggered by Ansible" && sleep 1'
+      async: 5
+      poll: 0
+      ignore_errors: true
+    - name: wait for reboot and reconnect...
+      wait_for_connection:
+        connect_timeout: 2
+        sleep: 2
+        delay: 2
+        timeout: 3000
