@@ -74,6 +74,6 @@ spec:
           effect: NoSchedule
       containers:
       - name: iperf-client
-        image: mlabbe/iperf
+        image: networkstatic/iperf3
         command: ['/bin/sh', '-c', 'sleep infinity']
       terminationGracePeriodSeconds: 0
