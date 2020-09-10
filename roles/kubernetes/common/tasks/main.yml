@@ -60,6 +60,8 @@
     - { src: kubelet.service.j2, dest: "/etc/systemd/system/kubelet.service" }
 
 - name: handle cni-plugins
+  when:
+   - '"flannel" in addons_network'
   unarchive:
     src: "/tmp/repository/cni-plugins_linux_amd64.tgz"
     dest: "/opt/cni/bin"
