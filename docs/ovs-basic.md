@@ -1,77 +1,105 @@
-## openvswitch 学习
+OpenVSwitch 学习
+---
 
-# CentOS7 开启
+### 开启大页内存
 
-现在的 CentOS7(7.8.2003)都是内核态自带了`openvswitch.ko`, 可以通过如下命令`modinfo openvswitch`, 我这里:
+``` bash
+sed -i '/GRUB_CMDLINE_LINUX_DEFAULT/d' /etc/default/grub
+cat<<'EOF'>>/etc/default/grub
+GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt"
+EOF
+grub2-mkconfig -o /boot/grub2/grub.cfg
+
+reboot
+
+grep Huge /proc/meminfo
+
+sed -i '/vm.nr_hugepages/d' /etc/sysctl.d/hugepages.conf
+echo 'vm.nr_hugepages=1024' > /etc/sysctl.d/hugepages.conf
+sysctl --system
+
+grep Huge /proc/meminfo
+
+
+sed -i '/hugetlbfs/d' /etc/fstab
+cat <<'EOF'>>/etc/fstab
+none /dev/hugepages hugetlbfs pagesize=1G 0 0
+EOF
+mount -a
 
 ```
-filename:       /lib/modules/3.10.0-1127.el7.x86_64/kernel/net/openvswitch/openvswitch.ko.xz
-alias:          net-pf-16-proto-16-family-ovs_packet
-alias:          net-pf-16-proto-16-family-ovs_flow
-alias:          net-pf-16-proto-16-family-ovs_vport
-alias:          net-pf-16-proto-16-family-ovs_datapath
-license:        GPL
-description:    Open vSwitch switching datapath
-retpoline:      Y
-rhelversion:    7.8
-srcversion:     A0E0E36B77DC28BC8DE7469
-depends:        nf_conntrack,nf_nat,libcrc32c,nf_nat_ipv6,nf_nat_ipv4,nf_defrag_ipv6
-intree:         Y
-vermagic:       3.10.0-1127.el7.x86_64 SMP mod_unload modversions 
-signer:         CentOS Linux kernel signing key
-sig_key:        69:0E:8A:48:2F:E7:6B:FB:F2:31:D8:60:F0:C6:62:D8:F1:17:3D:57
-sig_hashalgo:   sha256
+
+### 安装DPDK
+
+``` bash
+yum install -y numactl-devel automake gcc gcc-c++ elfutils-libelf-devel kernel-devel
+yum install -y "kernel-devel-uname-r == $(uname -r)"
+
+export DPDK_DIR=/usr/src/dpdk && mkdir -p ${DPDK_DIR}
+export DPDK_TARGET=x86_64-native-linuxapp-gcc
+export DPDK_BUILD=$DPDK_DIR/$DPDK_TARGET
+curl -ssL https://fast.dpdk.org/rel/dpdk-2.2.0.tar.xz \
+  | tar xJ --strip-components=1 -C ${DPDK_DIR}
+
+sed -i 's/^CONFIG_RTE_BUILD_COMBINE_LIBS=.*/CONFIG_RTE_BUILD_COMBINE_LIBS=y/g' ${DPDK_DIR}/config/common_linuxapp
+sed -i 's/^CONFIG_RTE_LIBRTE_KNI=.*/CONFIG_RTE_LIBRTE_KNI=n/g' ${DPDK_DIR}/config/common_linuxapp
+sed -i 's/^CONFIG_RTE_KNI_KMOD=.*/CONFIG_RTE_KNI_KMOD=n/g' ${DPDK_DIR}/config/common_linuxapp
+cd ${DPDK_DIR} && make install -j8 T=$DPDK_TARGET DESTDIR=install
 ```
 
-安装dpdk的组件`yum install -y dpdk-tools dpdk`, `dpdk-devbind --status`查看当前网卡绑定状态:
-
-```
-Network devices using kernel driver
-===================================
-0000:0b:00.0 'VMXNET3 Ethernet Controller 07b0' if=ens192 drv=vmxnet3 unused= *Active*
-0000:13:00.0 '82574L Gigabit Network Connection 10d3' if=ens224 drv=e1000e unused= *Active*
-
-No 'Crypto' devices detected
-============================
-
-No 'Eventdev' devices detected
-==============================
-
-No 'Mempool' devices detected
-=============================
-
-No 'Compress' devices detected
-==============================
-```
-
-
-下面只需要安装必要的外围工具即可:
+### 编译OVS:
 
 ```bash
+# 安装依赖
+yum install -y openssl-devel gcc make autoconf automake libpcap-devel libcap-ng-devel \
+    python-sphinx python-devel graphviz rpm-build redhat-rpm-config libtool python-twisted-core python-zope-interface groff checkpolicy selinux-policy-devel
 
-# 安装用户态的工具
-curl -o /etc/yum.repos.d/leifmadsen-ovs-master-epel-7.repo \
-      https://copr.fedorainfracloud.org/coprs/leifmadsen/ovs-master/repo/epel-7/leifmadsen-ovs-master-epel-7.repo
-yum install -y openvswitch
+export OVS_DIR=/usr/src/openvswitch && mkdir -p ${OVS_DIR}
+curl -ssL https://www.openvswitch.org/releases/openvswitch-2.5.10.tar.gz \
+  | tar xz --strip-components=1 -C ${OVS_DIR}
+
+cd ${OVS_DIR} && ./boot.sh
+cd ${OVS_DIR} && ./configure --with-dpdk=$DPDK_BUILD CFLAGS="-g -O2 -Wno-cast-align"
+cd ${OVS_DIR} && make -j 8 install CFLAGS='-O3 -march=native'
 
 # 创建db
-ovsdb-tool create /etc/openvswitch/conf.db
+mkdir -p /usr/local/etc/openvswitch
+mkdir -p /usr/local/var/run/openvswitch
+rm -rf /usr/local/etc/openvswitch/conf.db
+ovsdb-tool create /usr/local/etc/openvswitch/conf.db  \
+            /usr/local/share/openvswitch/vswitch.ovsschema
 
-# 初始化db
-ovsdb-server -v --remote=punix:/var/run/openvswitch/db.sock --remote=db:Open_vSwitch,Open_vSwitch,manager_options --private-key=db:Open_vSwitch,SSL,private_key --certificate=db:Open_vSwitch,SSL,certificate --bootstrap-ca-cert=db:Open_vSwitch,SSL,ca_cert --pidfile --detach
+ovsdb-server --remote=punix:/usr/local/var/run/openvswitch/db.sock \
+      --remote=db:Open_vSwitch,Open_vSwitch,manager_options \
+      --private-key=db:Open_vSwitch,SSL,private_key \
+      --certificate=Open_vSwitch,SSL,certificate \
+      --bootstrap-ca-cert=db:Open_vSwitch,SSL,ca_cert --pidfile --detach
+
 ovs-vsctl --no-wait init
 
+
+mount -t hugetlbfs -o pagesize=2MB none /dev/hugepages_2mb
+
+
 # 启动ovs
-ovs-vswitchd --pidfile --detach
+ovs-vswitchd --dpdk -c 0x1 -n 4 --socket-mem 1024,0 \
+   -- unix:/usr/local/var/run/openvswitch/db.sock --pidfile --detach
 
 # 检查进程
 ps -ef | grep ovs
 ovs-vsctl --version
-
 ```
 
 
+### FAQ
+- [Open vSwitch2.3.0版本安装部署及基本操作](https://www.sdnlab.com/3166.html)
+- [Ovs+Dpdk简单实践](https://www.sdnlab.com/16593.html)
+- [ovs版本配套关系](https://docs.openvswitch.org/en/latest/faq/releases/)
+- [ovs2.5安装指南(DPDK)](https://www.openvswitch.org/support/dist-docs-2.5/INSTALL.DPDK.md.txt)
 
 
-## FAQ
-[Open vSwitch2.3.0版本安装部署及基本操作](https://www.sdnlab.com/3166.html)
+
+
+
+
+
