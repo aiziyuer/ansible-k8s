@@ -6,26 +6,25 @@ OpenVSwitch 学习
 ``` bash
 sed -i '/GRUB_CMDLINE_LINUX_DEFAULT/d' /etc/default/grub
 cat<<'EOF'>>/etc/default/grub
-GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt"
+GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt default_hugepagesz=2M"
 EOF
 grub2-mkconfig -o /boot/grub2/grub.cfg
 
 reboot
 
+# 查看内存
 grep Huge /proc/meminfo
+cat /proc/meminfo | grep -i huge
 
 sed -i '/vm.nr_hugepages/d' /etc/sysctl.d/hugepages.conf
 echo 'vm.nr_hugepages=1024' > /etc/sysctl.d/hugepages.conf
 sysctl --system
 
-grep Huge /proc/meminfo
-
-
-sed -i '/hugetlbfs/d' /etc/fstab
-cat <<'EOF'>>/etc/fstab
-none /dev/hugepages hugetlbfs pagesize=1G 0 0
-EOF
-mount -a
+# sed -i '/hugetlbfs/d' /etc/fstab
+# cat <<'EOF'>>/etc/fstab
+# none /dev/hugepages hugetlbfs pagesize=1G 0 0
+# EOF
+# mount -a
 
 ```
 
@@ -45,6 +44,17 @@ sed -i 's/^CONFIG_RTE_BUILD_COMBINE_LIBS=.*/CONFIG_RTE_BUILD_COMBINE_LIBS=y/g' $
 sed -i 's/^CONFIG_RTE_LIBRTE_KNI=.*/CONFIG_RTE_LIBRTE_KNI=n/g' ${DPDK_DIR}/config/common_linuxapp
 sed -i 's/^CONFIG_RTE_KNI_KMOD=.*/CONFIG_RTE_KNI_KMOD=n/g' ${DPDK_DIR}/config/common_linuxapp
 cd ${DPDK_DIR} && make install -j8 T=$DPDK_TARGET DESTDIR=install
+
+
+# 加载内核模块
+modprobe uio
+insmod /usr/src/dpdk/x86_64-native-linuxapp-gcc/kmod/igb_uio.ko
+
+# 使能设备
+ifconfig ens224 down
+/usr/src/dpdk/tools/dpdk_nic_bind.py --bind=igb_uio ens224
+/usr/src/dpdk/tools/dpdk_nic_bind.py --status
+
 ```
 
 ### 编译OVS:
@@ -77,17 +87,25 @@ ovsdb-server --remote=punix:/usr/local/var/run/openvswitch/db.sock \
 
 ovs-vsctl --no-wait init
 
+# mkdir -p /dev/hugepages_2mb
+# mount -t hugetlbfs -o pagesize=2MB none /dev/hugepages_2mb
+# mount -t hugetlbfs -o pagesize=1G none /dev/hugepages
 
-mount -t hugetlbfs -o pagesize=2MB none /dev/hugepages_2mb
-
+mount -t hugetlbfs -o pagesize=1G nonedev /dev/hugepages
 
 # 启动ovs
+export DB_SOCK=/usr/local/var/run/openvswitch/db.sock
 ovs-vswitchd --dpdk -c 0x1 -n 4 --socket-mem 1024,0 \
-   -- unix:/usr/local/var/run/openvswitch/db.sock --pidfile --detach
+   -- unix:$DB_SOCK --pidfile --detach --log-file
 
 # 检查进程
 ps -ef | grep ovs
 ovs-vsctl --version
+
+ovs-vsctl add-br br-tun -- set bridge br-tun datapath_type=netdev
+ovs-vsctl add-port br-tun dpdk0 -- set Interface dpdk0 type=dpdk
+ovs-vsctl add-port br-tun eth0 -- set interface eth0 type=internal 
+
 ```
 
 
