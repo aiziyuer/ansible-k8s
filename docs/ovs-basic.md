@@ -31,14 +31,14 @@ sysctl --system
 ### 安装DPDK
 
 ``` bash
-yum install -y numactl-devel automake gcc gcc-c++ elfutils-libelf-devel kernel-devel
+yum install -y numactl numactl-devel automake gcc gcc-c++ elfutils-libelf-devel kernel-devel
 yum install -y "kernel-devel-uname-r == $(uname -r)"
 
-export DPDK_DIR=/usr/src/dpdk && mkdir -p ${DPDK_DIR}
-export DPDK_TARGET=x86_64-native-linuxapp-gcc
-export DPDK_BUILD=$DPDK_DIR/$DPDK_TARGET
+export RTE_SDK=/usr/src/dpdk && mkdir -p ${RTE_SDK}
+export RTE_TARGET=x86_64-native-linuxapp-gcc
+export DPDK_BUILD=$RTE_SDK/$RTE_TARGET
 curl -ssL https://fast.dpdk.org/rel/dpdk-2.2.0.tar.xz \
-  | tar xJ --strip-components=1 -C ${DPDK_DIR}
+  | tar xJ --strip-components=1 -C ${RTE_SDK}
 
 sed -i 's/^CONFIG_RTE_BUILD_COMBINE_LIBS=.*/CONFIG_RTE_BUILD_COMBINE_LIBS=y/g' ${DPDK_DIR}/config/common_linuxapp
 sed -i 's/^CONFIG_RTE_LIBRTE_KNI=.*/CONFIG_RTE_LIBRTE_KNI=n/g' ${DPDK_DIR}/config/common_linuxapp
@@ -91,12 +91,15 @@ ovs-vsctl --no-wait init
 # mount -t hugetlbfs -o pagesize=2MB none /dev/hugepages_2mb
 # mount -t hugetlbfs -o pagesize=1G none /dev/hugepages
 
-mount -t hugetlbfs -o pagesize=1G nonedev /dev/hugepages
+mkdir -p /mnt/hugepages_2mb && mount -t hugetlbfs -o pagesize=2MB /mnt/hugepages_2mb
 
 # 启动ovs
 export DB_SOCK=/usr/local/var/run/openvswitch/db.sock
 ovs-vswitchd --dpdk -c 0x1 -n 4 --socket-mem 1024,0 \
    -- unix:$DB_SOCK --pidfile --detach --log-file
+
+ovs-vswitchd --dpdk --socket-mem 1024,0 \
+   -- unix:/usr/local/var/run/openvswitch/db.sock --pidfile --detach --log-file
 
 # 检查进程
 ps -ef | grep ovs
@@ -107,7 +110,6 @@ ovs-vsctl add-port br-tun dpdk0 -- set Interface dpdk0 type=dpdk
 ovs-vsctl add-port br-tun eth0 -- set interface eth0 type=internal 
 
 ```
-
 
 ### FAQ
 - [Open vSwitch2.3.0版本安装部署及基本操作](https://www.sdnlab.com/3166.html)
