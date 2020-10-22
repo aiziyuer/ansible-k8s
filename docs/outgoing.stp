@@ -1,0 +1,44 @@
+#! /usr/bin/env stap
+
+/**
+
+stap -r 3.10.0-327.ali2016.alios7 outgoing.stp -m outgoing -p4
+
+*/
+
+probe kernel.function("tcp_v4_connect").return {
+
+	saddr   = format_ipaddr(__ip_sock_saddr(@entry($sk)), __ip_sock_family(@entry($sk)))
+	daddr   = format_ipaddr(__ip_sock_daddr(@entry($sk)), __ip_sock_family(@entry($sk)))
+	sport   = __tcp_sock_sport(@entry($sk))
+	dport   = __tcp_sock_dport(@entry($sk))
+
+    if(daddr != "1.1.1.1") next;
+
+    printf(" %15s %15s %5d %5d TCP NEW\n",saddr, daddr, sport, dport)
+
+}
+
+probe tcp.sendmsg {
+
+	saddr   = format_ipaddr(__ip_sock_saddr($sk), __ip_sock_family($sk))
+	daddr   = format_ipaddr(__ip_sock_daddr($sk), __ip_sock_family($sk))
+	sport   = __tcp_sock_sport($sk)
+	dport   = __tcp_sock_dport($sk)
+
+    if(daddr != "1.1.1.1") next;
+    printf(" %15s %15s %5d %5d TCP TRANS\n",saddr, daddr, sport, dport)
+
+}
+
+probe udp.sendmsg {
+
+    saddr   = format_ipaddr(__ip_sock_saddr($sk), __ip_sock_family($sk))
+	daddr   = format_ipaddr(__ip_sock_daddr($sk), __ip_sock_family($sk))
+	sport   = __tcp_sock_sport($sk)
+    dport   = __tcp_sock_sport($sk)
+
+    if(daddr != "1.1.1.1") next;
+    printf(" %15s %15s %5d %5d TCP TRANS\n",saddr, daddr, sport, dport)
+
+}
