@@ -1,8 +1,14 @@
 {
     "CN":"{{ inventory_hostname }}",
     "hosts": [
-        "{{ inventory_hostname }}",
-        "{{ hostvars[inventory_hostname]['ansible_' + network_interface]['ipv4']['address'] }}"
+        {% for host in groups['master'] %}
+        "{{ host }}",
+        {% endfor %}
+        "127.0.0.1",
+        {% for host in groups['master'] %}
+        "{{ hostvars[host]['ansible_' + network_interface]['ipv4']['address']}}",
+        {% endfor %}
+        "localhost"
     ],
     "key": {
         "algo": "ecdsa",

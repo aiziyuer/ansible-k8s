@@ -59,20 +59,41 @@
 - name: 1.5 copy etcd root-ca certs
   copy: src={{ item }} dest=/etc/etcd/certs/
   with_fileglob:
-    - '../files/etcd/certs/*'
+    - '../files/etcd/certs/ca*.json'
 
-- name: 1.6 copy etcd server csr
+- name: 1.6 prepare generate etcd ca
+  when:
+    - groups['master'][0] == inventory_hostname
+  shell: |
+    cd /etc/etcd/certs
+    cfssl gencert -initca ca-csr.json | cfssljson -bare ca -
+
+- name: 1.7 fetch generated ca to local /tmp
+  when:
+    - groups['master'][0] == inventory_hostname
+  fetch:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    flat: yes
+  with_items:
+   - {src: /etc/etcd/certs/ca.pem, dest: '/tmp/etcd/certs/' }
+   - {src: /etc/etcd/certs/ca-key.pem, dest: '/tmp/etcd/certs/' }
+
+- name: 1.8 copy etcd root-ca certs
+  copy: src={{ item }} dest=/etc/etcd/certs/
+  with_fileglob:
+    - '../files/etcd/certs/*'
+    - '/tmp/etcd/certs/*.pem'
+
+- name: 1.9 copy etcd server csr
   template: src={{ item.src }} dest={{ item.dest }} mode=0755
   with_items:
    - {src: etcd/certs/config.json.j2, dest: '/etc/etcd/certs/config.json' }
   register: etcd_certs_config
 
-- name: 1.7 generate etcd server/peer certs
-#   when:
-#    - etcd_certs_config.changed
+- name: 1.10 generate etcd server/peer certs
   shell: |
     cd /etc/etcd/certs
-    cfssl gencert -initca ca-csr.json | cfssljson -bare ca -
     cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json \
      -profile=client client.json | cfssljson -bare client
     cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json \
@@ -80,13 +101,13 @@
     cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json \
     -profile=peer config.json | cfssljson -bare peer
 
-- name: 1.8 config etcd's config and service
+- name: 1.11 config etcd's config and service
   template: src={{ item.src }} dest={{ item.dest }} mode=0500
   with_items:
    - {src: etcd/etcd.conf.j2, dest: '/etc/etcd/etcd.conf' }
    - {src: etcd.service.j2, dest: '/etc/systemd/system/etcd.service'}
 
-- name: 1.9 try restart etcd daemon
+- name: 1.12 try restart etcd daemon
   systemd:
     name: etcd
     daemon_reload: yes
