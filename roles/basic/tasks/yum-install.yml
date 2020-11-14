@@ -1,10 +1,4 @@
 ---
-- name: add epel yum repo
-  yum:
-    state: present
-    name:
-      - epel-release
-
 - name: install packages
   yum:
     state: present
@@ -19,23 +13,12 @@
       - tree
       - git
       - zsh
-      - jq
       - telnet
-      - tcpdump
-      - fuse
-      - fuse-libs
-      #  - glusterfs-libs-{{ gluster_version }}
-      #  - glusterfs-client-xlators-{{ gluster_version }}
-      #  - glusterfs-{{ gluster_version }}
-      #  - glusterfs-fuse-{{ gluster_version }}
       - iptables
       - conntrack
       - sysstat
       - wget
       - lrzsz
-      - nc
-      - pv
-      - sshpass
       - iptables-services
       - ipvsadm
       - ipset
