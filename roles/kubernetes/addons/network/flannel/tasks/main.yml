@@ -12,6 +12,8 @@
   when: item.state == 'file'
 
 - name: kubectl apply -f xxx
+  when:
+    - groups['master'][0] == inventory_hostname
   shell: |
     # export KUBECONFIG=/etc/kubernetes/admin.conf
     while kubectl apply -f {{ item }} &>/dev/null; [ $? -ne 0 ]; do echo "kubectl apply -f {{ item }} ..."; sleep 2; done
