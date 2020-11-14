@@ -4,18 +4,6 @@
   with_items:
     - /tmp/repository
 
-- name: disable ipv6 by sysctl
-  sysctl:
-    name: "{{ item.name }}"
-    value: "{{ item.value }}"
-    state: present
-  when:
-    - disable_ipv6 | default('true') | bool
-  with_items:
-    - { name: "net.ipv6.conf.all.disable_ipv6", value: "1" }
-    - { name: "net.ipv6.conf.default.disable_ipv6", value: "1" }
-    - { name: "net.ipv6.conf.lo.disable_ipv6", value: "1" }
-
 - name: download all
   shell: |
     while echo '{{ item.sha256sum }} {{ item.dest }}' | sha256sum --check --status &>/dev/null; [ $? -ne 0 ]; do curl -sSL {{ item.url }} -o {{ item.dest }}; done

@@ -14,7 +14,20 @@
    name: firewalld
    state: stopped
    enabled: False
-
+  ignore_errors: True
+  
+- name: disable ipv6 by sysctl
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: present
+  when:
+    - disable_ipv6 | default('true') | bool
+  with_items:
+    - { name: "net.ipv6.conf.all.disable_ipv6", value: "1" }
+    - { name: "net.ipv6.conf.default.disable_ipv6", value: "1" }
+    - { name: "net.ipv6.conf.lo.disable_ipv6", value: "1" }
+    
 - name: install nessary dependencies
   include_tasks:  "yum-install.yml"
   when:
