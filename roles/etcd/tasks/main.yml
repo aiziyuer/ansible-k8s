@@ -5,6 +5,18 @@
     path: "/etc/etcd/etcd.conf"
   register: etcd_config
 
+- name: add etcd master to hosts
+  shell: |
+    sed -i '/# etcd masters start/,/# etcd masters end/d' /etc/hosts
+    cat <<EOF >> /etc/hosts
+
+    # etcd masters start
+    {% for host in groups['master'] %}
+    {{ hostvars[host]['ansible_' + network_interface]['ipv4']['address']}} {{ host }}
+    {% endfor %}
+    # etcd masters end
+    EOF
+
 - name: start install etcd
   when:
    - (groups['master'] | length > 0 )
