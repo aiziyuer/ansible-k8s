@@ -23,10 +23,41 @@
     - "../templates/"
   when: item.state == 'file'
 
-- name: kubeadm init
+- name: kubeadm init for first master node
   when:
     - groups['master'][0] == inventory_hostname
     - not var_kubeadm_conf.stat.exists
+  shell: |
+    kubeadm init --config=/root/.kube/install/kubeadmcfg.yml
+  register: kubeadm_init
+- debug: var=kubeadm_init
+
+- name: fetch generated certificates from first master node
+  when:
+    - groups['master'][0] == inventory_hostname
+  fetch:
+    src: "{{ item }}"
+    dest: "/tmp/kubernetes/pki/"
+    flat: yes
+  with_items: 
+    - /etc/kubernetes/pki/ca.crt
+    - /etc/kubernetes/pki/ca.key
+    - /etc/kubernetes/pki/sa.key
+    - /etc/kubernetes/pki/sa.pub
+
+- name: copy kubernetes certs to others master nodes
+  copy: src={{ item }} dest=/etc/kubernetes/pki/
+  when:
+    - groups['master'][0] != inventory_hostname
+  with_fileglob:
+    - /tmp/kubernetes/pki/ca.crt
+    - /tmp/kubernetes/pki/ca.key
+    - /tmp/kubernetes/pki/sa.key
+    - /tmp/kubernetes/pki/sa.pub
+
+- name: kubeadm init for other master nodes
+  when:
+    - groups['master'][0] != inventory_hostname
   shell: |
     cd /root/k8s
     kubeadm init --config=.kube/install/kubeadmcfg.yml

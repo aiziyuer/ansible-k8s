@@ -3,7 +3,7 @@
   file: path={{ item }} state=directory
   with_items:
     - /etc/systemd/system
-    - /etc/kuberentes/mainifest
+    - /etc/kubernetes/manifest
     - /opt/cni/bin
 
 - name: disable system swap
