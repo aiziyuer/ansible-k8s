@@ -1,0 +1,43 @@
+! Configuration File for keepalived
+
+global_defs {
+}
+
+
+local_address_group laddr_g1 {
+     {{ hostvars[inventory_hostname]['ansible_'+network_interface]['ipv4']['address']  }}             #LOCAL ip 用于和后端设备通信
+}
+
+
+virtual_server_group 70621a7fa6e1db9e0afc2dbe3d42f9be {
+      {{ groups['kubernetes'] | map('extract',hostvars,'master_ip') | first }} 6443      #虚拟ip用于和client通信
+}
+
+# kubernetes 
+virtual_server {{ groups['kubernetes'] | map('extract',hostvars,'master_ip') | first }} 6443 {
+    delay_loop 6              # 服务轮询的时间间隔
+    lb_algo rr                # LVS调度算法，支持rr|wrr|lc|wlc|lblc|sh|dh
+    persistence_timeout 60    # 模板时间
+    lb_kind FNAT              # LVS集群模式
+    protocol TCP              # 支持的协议模式是TCP还是UDP
+    laddr_group_name laddr_g1
+    checker_merge             # 后端健康检查合并
+    alpha                     # 开启alpha模式
+    omega                     # 开启omega模式
+    quorum 1                  # 服务是否有效的阀值
+    hysteresis 0              # 延迟系数（跟quorum配合使用）
+
+    #高于或低于阀值时会执行以下脚本。
+    quorum_up "/usr/sbin/ip addr add {{ groups['kubernetes'] | map('extract',hostvars,'master_ip') | first }}/32 dev lo;"
+
+{% for host in groups['master'] %}
+    # {{ host }}
+    real_server {{ hostvars[host]['ansible_' + network_interface]['ipv4']['address']}} 6443 {
+        weight 1
+        TCP_CHECK { 
+           connect_timeout 15
+           nb_get_retry 5
+           delay_before_retry 3
+        }
+    }
+{% endfor %}

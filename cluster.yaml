@@ -7,6 +7,12 @@
     - { role: basic, tags: basic }
     - { role: docker, tags: docker }
 
+- hosts: lb
+  gather_facts: yes
+  become: yes
+  roles:
+    - { role: keepalived, tags: keepalived }
+
 - hosts: master
   gather_facts: yes
   become: yes

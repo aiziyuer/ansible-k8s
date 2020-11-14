@@ -1,0 +1,21 @@
+---
+
+- name: copy keepalived config
+  template: src={{ item.src }} dest={{ item.dest }} mode=0600
+  with_items:
+   - {src: keepalived.conf.j2, dest: '/etc/keepalived/keepalived.conf' }
+
+
+- name: try start keepalived daemon
+  systemd:
+    name: keepalived
+    daemon_reload: yes
+    state: started
+    enabled: yes
+
+- name: try reload keepalived daemon
+  systemd:
+    name: keepalived
+    daemon_reload: yes
+    state: reloaded
+    enabled: yes
