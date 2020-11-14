@@ -15,9 +15,9 @@ virtual_server_group 70621a7fa6e1db9e0afc2dbe3d42f9be {
 
 # kubernetes 
 virtual_server {{ groups['kubernetes'] | map('extract',hostvars,'master_ip') | first }} 6443 {
-    delay_loop 6              # 服务轮询的时间间隔
+    delay_loop 1              # 服务轮询的时间间隔
     lb_algo rr                # LVS调度算法，支持rr|wrr|lc|wlc|lblc|sh|dh
-    persistence_timeout 60    # 模板时间
+    persistence_timeout 6     # 模板时间
     lb_kind FNAT              # LVS集群模式
     protocol TCP              # 支持的协议模式是TCP还是UDP
     laddr_group_name laddr_g1
@@ -41,3 +41,5 @@ virtual_server {{ groups['kubernetes'] | map('extract',hostvars,'master_ip') | f
         }
     }
 {% endfor %}
+
+}

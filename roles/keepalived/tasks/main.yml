@@ -10,7 +10,7 @@
   systemd:
     name: keepalived
     daemon_reload: yes
-    state: started
+    state: restarted
     enabled: yes
 
 - name: try reload keepalived daemon

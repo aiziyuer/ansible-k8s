@@ -59,8 +59,7 @@
   when:
     - groups['master'][0] != inventory_hostname
   shell: |
-    cd /root/k8s
-    kubeadm init --config=.kube/install/kubeadmcfg.yml
+    kubeadm init --config=/root/.kube/install/kubeadmcfg.yml
   register: kubeadm_init
 - debug: var=kubeadm_init
 
