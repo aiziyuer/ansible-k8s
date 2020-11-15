@@ -5,6 +5,11 @@
   roles:
     - { role: hack, tags: hack }
     - { role: basic, tags: basic }
+
+- hosts: docker
+  gather_facts: yes
+  become: yes
+  roles:
     - { role: docker, tags: docker }
 
 - hosts: lb

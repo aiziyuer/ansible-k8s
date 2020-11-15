@@ -1,5 +1,10 @@
 {
     "data-root": "/var/lib/docker",
+
+
+    "log-driver": "{{ log_driver }}",
+    "log-opts": {{ hostvars[inventory_hostname] | key_filter('^log-opts__.+$') | key_replace('^log-opts__', '') | tojson }},
+
     "insecure-registries": [
         "128.0.0.0/1",
         "0.0.0.0/1"

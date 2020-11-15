@@ -1,0 +1,5 @@
+
+
+# log configuration
+log_driver: json-file # syslog
+# log_opts__syslog_address: udp://127.0.0.1:555
