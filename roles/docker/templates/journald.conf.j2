@@ -1,0 +1,31 @@
+[Journal]
+#Storage=auto  存储为自动模式, 其他模式有无日志模式, 纯内存模式和纯磁盘模式
+#Compress=yes  默认启动压缩功能
+#Seal=yes   默认加密, 日志文件为二进制文件, 无法 vim或tail 查看
+#SplitMode=uid
+#SyncIntervalSec=5m
+#RateLimitIntervalSec=30s
+#RateLimitBurst=1000
+#SystemMaxUse=  精确设置日志可以占用的最大磁盘空间
+#SystemKeepFree=  保证系统剩余的空间大小
+#SystemMaxFileSize=
+#SystemMaxFiles=100
+#RuntimeMaxUse=
+#RuntimeKeepFree=
+#RuntimeMaxFileSize=
+#RuntimeMaxFiles=100
+#MaxRetentionSec=
+#MaxFileSec=1month
+#ForwardToSyslog=no
+#ForwardToKMsg=no
+#ForwardToConsole=no
+#ForwardToWall=yes
+#TTYPath=/dev/console
+#MaxLevelStore=debug
+#MaxLevelSyslog=debug
+#MaxLevelKMsg=notice
+#MaxLevelConsole=info
+#MaxLevelWall=emerg
+
+#ForwardToSyslog=no      # 这个系统默认是yes, 关闭后在/var/log/message看不到了
+#ForwardToWall=no        # 这个系统默认是yes, 关闭后在/var/log/message看不到了

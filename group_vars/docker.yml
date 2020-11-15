@@ -1,5 +1,7 @@
 
 
 # log configuration
-log_driver: json-file # syslog
-# log_opts__syslog_address: udp://127.0.0.1:555
+log_driver: json-file # syslog,journald
+log_opts__max-size: 200m
+log_opts__max-file: 3
+# log-opts__syslog-address='udp://10.10.10.202:555'

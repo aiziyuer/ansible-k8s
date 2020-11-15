@@ -51,10 +51,18 @@
     - {src: docker.service.j2, dest: '/etc/systemd/system/docker.service'}
     - {src: seccomp.json, dest: '/etc/docker/seccomp.json'}
     - {src: daemon.json.j2, dest: '/etc/docker/daemon.json'}
+    - {src: journald.conf.j2, dest: '/etc/systemd/journald.conf'}
 
 - name: 1.7 try restart docker daemon
   systemd:
     name: docker
+    daemon_reload: yes
+    state: restarted
+    enabled: yes
+
+- name: 1.8 try restart systemd-journald
+  systemd:
+    name: systemd-journald
     daemon_reload: yes
     state: restarted
     enabled: yes
