@@ -34,11 +34,21 @@ virtual_server {{ groups['kubernetes'] | map('extract',hostvars,'master_ip') | f
     # {{ host }}
     real_server {{ hostvars[host]['ansible_' + network_interface]['ipv4']['address']}} 6443 {
         weight 1
-        TCP_CHECK { 
-           connect_timeout 15
-           nb_get_retry 5
-           delay_before_retry 3
+
+        SSL_GET {
+            url {
+                # genhash -S --server 10.11.10.194 --port 6443 --url /healthz
+                path /healthz
+                digest 444bcb3a3fcf8389296c49467f27e1d6
+            }
+            connect_timeout 15
         }
+
+    #    TCP_CHECK { 
+    #       connect_timeout 15
+    #       delay_before_retry 3
+    #    }
+
     }
 {% endfor %}
 
