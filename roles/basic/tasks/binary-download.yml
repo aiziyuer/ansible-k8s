@@ -6,50 +6,52 @@
 
 - name: download all
   shell: |
-    while echo '{{ item.sha256sum }} {{ item.dest }}' | sha256sum --check --status &>/dev/null; [ $? -ne 0 ]; do curl -sSL {{ item.url }} -o {{ item.dest }}; done
+    while echo '{{ item.sha256sum }} {{ item.dest }}' | sha256sum --check --status &>/dev/null; [ $? -ne 0 ]; do 
+        curl -sSL {{ item.url }} -o {{ item.dest }}; 
+    done
   with_items:
     - {
-        dest: "/tmp/repository/docker_v{{ docker_version }}_linux_adm64.tgz",
-        sha256sum: "82a362af7689038c51573e0fd0554da8703f0d06f4dfe95dd5bda5acf0ae45fb",
-        url: "https://download.docker.com/linux/static/stable/x86_64/docker-{{ docker_version }}.tgz",
+        dest: "/tmp/repository/{{ binaries['docker']['name'] }}",
+        sha256sum: "{{ binaries['docker']['versions'][docker_version]['sha256sum'] }}",
+        url: "{{ binaries['docker']['versions'][docker_version]['url'] }}",
       }
     - {
-        dest: "/tmp/repository/cfssl_v{{ cfssl_version }}_linux_amd64",
-        sha256sum: "d01a26bc88851aab4c986e820e7b3885cedf1316a9c26a98fbba83105cfd7b87",
-        url: "https://github.com/cloudflare/cfssl/releases/download/v{{ cfssl_version }}/cfssl_{{ cfssl_version }}_linux_amd64",
+        dest: "/tmp/repository/{{ binaries['cfssl']['name'] }}",
+        sha256sum: "{{ binaries['cfssl']['versions'][cfssl_version]['sha256sum'] }}",
+        url: "{{ binaries['cfssl']['versions'][cfssl_version]['url'] }}",
       }
     - {
-        dest: "/tmp/repository/cfssljson_v{{ cfssl_version }}_linux_amd64",
-        sha256sum: "05d67e05cacb8b2e78e737637acdcf9127b0732f0c4104403e9e9b74032fd685",
-        url: "https://github.com/cloudflare/cfssl/releases/download/v{{ cfssl_version }}/cfssljson_{{ cfssl_version }}_linux_amd64",
+        dest: "/tmp/repository/{{ binaries['cfssljson']['name'] }}",
+        sha256sum: "{{ binaries['cfssljson']['versions'][cfssl_version]['sha256sum'] }}",
+        url: "{{ binaries['cfssljson']['versions'][cfssl_version]['url'] }}",
       }
     - {
-        dest: "/tmp/repository/etcd_{{ etcd_version }}_linux_amd64.tar.gz",
-        sha256sum: "bcab421f6bf4111accfceb004e0a0ac2bcfb92ac93081d9429e313248dd78c41",
-        url: "https://github.com/etcd-io/etcd/releases/download/{{ etcd_version }}/etcd-{{ etcd_version }}-linux-amd64.tar.gz",
+        dest: "/tmp/repository/{{ binaries['etcd']['name'] }}",
+        sha256sum: "{{ binaries['etcd']['versions'][etcd_version]['sha256sum'] }}",
+        url: "{{ binaries['etcd']['versions'][etcd_version]['url'] }}",
       }
     - {
-        dest: "/tmp/repository/kubernetes-server_{{ kubernetes_version }}_linux_amd64.tar.gz",
-        sha256sum: "199a3d8528e937de6d66071c4879e9b25e93a745cfec2bed7263db75a51d628b",
-        url: "https://dl.k8s.io/{{ kubernetes_version }}/kubernetes-server-linux-amd64.tar.gz",
+        dest: "/tmp/repository/{{ binaries['kubernetes-server']['name'] }}",
+        sha256sum: "{{ binaries['kubernetes-server']['versions'][kubernetes_version]['sha256sum'] }}",
+        url: "{{ binaries['kubernetes-server']['versions'][kubernetes_version]['url'] }}",
       }
     - {
-        dest: "/tmp/repository/kubernetes-node_{{ kubernetes_version }}_linux_amd64.tar.gz",
-        sha256sum: "9f85620d99037486f325247c6cf35d2bd7138bb24f2fdc42158db7aed53515cd",
-        url: "https://dl.k8s.io/{{ kubernetes_version }}/kubernetes-node-linux-amd64.tar.gz",
+        dest: "/tmp/repository/{{ binaries['kubernetes-node']['name'] }}",
+        sha256sum: "{{ binaries['kubernetes-node']['versions'][kubernetes_version]['sha256sum'] }}",
+        url: "{{ binaries['kubernetes-node']['versions'][kubernetes_version]['url'] }}",
       }
     - {
-        dest: "/tmp/repository/cni-plugins_linux_amd64.tgz",
-        sha256sum: "994fbfcdbb2eedcfa87e48d8edb9bb365f4e2747a7e47658482556c12fd9b2f5",
-        url: "https://github.com/containernetworking/plugins/releases/download/{{ kubernetes_cni_version }}/cni-plugins-linux-amd64-{{ kubernetes_cni_version }}.tgz",
+        dest: "/tmp/repository/{{ binaries['cni-plugins']['name'] }}",
+        sha256sum: "{{ binaries['cni-plugins']['versions'][kubernetes_cni_version]['sha256sum'] }}",
+        url: "{{ binaries['cni-plugins']['versions'][kubernetes_cni_version]['url'] }}",
       }
     - {
-        dest: "/tmp/repository/helm-linux-amd64.tar.gz",
-        sha256sum: "81e3974927b4f76e9f679d1f6d6b45748f8c84081a571741d48b2902d816e14c",
-        url: "https://get.helm.sh/helm-v3.3.1-linux-amd64.tar.gz",
+        dest: "/tmp/repository/{{ binaries['helm']['name'] }}",
+        sha256sum: "{{ binaries['helm']['versions'][helm_version]['sha256sum'] }}",
+        url: "{{ binaries['helm']['versions'][helm_version]['url'] }}",
       }
     - {
-        dest: "/tmp/repository/kubectl-ko",
-        sha256sum: "b2216939a08575cf547ad1e7d7df833ecbdc787769496bdaf4b7102183263c00",
-        url: "https://raw.githubusercontent.com/alauda/kube-ovn/release-1.4/dist/images/kubectl-ko",
+        dest: "/tmp/repository/{{ binaries['kubectl-ko']['name'] }}",
+        sha256sum: "{{ binaries['kubectl-ko']['versions'][kube_ovn_version]['sha256sum'] }}",
+        url: "{{ binaries['kubectl-ko']['versions'][kube_ovn_version]['url'] }}",
       }

@@ -39,13 +39,13 @@
   when: "'master' in group_names"
   copy: remote_src=yes src={{ item.src }} dest={{ item.dest | default("/usr/local/bin") }} mode=0755
   with_items:
-   - { src: "/tmp/repository/cfssl_v{{ cfssl_version }}_linux_amd64", dest: '/usr/local/bin/cfssl'}
-   - { src: "/tmp/repository/cfssljson_v{{ cfssl_version }}_linux_amd64", dest: '/usr/local/bin/cfssljson'}
+   - { src: "/tmp/repository/{{ binaries['cfssl']['name'] }}", dest: '/usr/local/bin/cfssl'}
+   - { src: "/tmp/repository/{{ binaries['cfssljson']['name'] }}", dest: '/usr/local/bin/cfssljson'}
 
 - name: 1.4 install etcd binaries
   when: "'master' in group_names"
   unarchive: 
-   src: "/tmp/repository/etcd_{{ etcd_version }}_linux_amd64.tar.gz"
+   src: "/tmp/repository/{{ binaries['etcd']['name'] }}"
    dest: '/usr/local/bin'
    remote_src: yes
    extra_opts: 

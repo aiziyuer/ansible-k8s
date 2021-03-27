@@ -1,7 +1,7 @@
 ---
 - name: install helm cli
   unarchive: 
-   src: "/tmp/repository/helm-linux-amd64.tar.gz"
+   src: "/tmp/repository/{{ binaries['helm']['name'] }}"
    dest: '/usr/local/bin'
    remote_src: yes
    extra_opts: 

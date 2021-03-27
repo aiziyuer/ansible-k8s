@@ -15,7 +15,9 @@ gluster_version: 4.1.9
 # network plugin(options: flannel, kube-ovn)
 addons_network: flannel
 flannel_version: v0.12.0
-kube-ovn_version: v1.4.0
+kube_ovn_version: v1.4.0
+
+helm_version: v3.3.1
 
 # kubernete configuration
 # eg. token: b0f7b8.8d1767879297d85c
@@ -29,3 +31,61 @@ ansible_ssh_user: root
 ansible_ssh_pass: Changeme_123
 ansible_connection: ssh
 
+binaries_mirrors:
+  - "https://download.aiziyuer.familyds.com:5001/blob/sha256sum"
+
+binaries:
+  docker:
+    name: docker.tgz
+    versions:
+      "18.09.9":
+        sha256sum: "82a362af7689038c51573e0fd0554da8703f0d06f4dfe95dd5bda5acf0ae45fb"
+        url: "https://download.docker.com/linux/static/stable/x86_64/docker-18.09.9.tgz"
+  cfssl:
+    name: cfssl
+    versions:
+      "1.4.1":
+        sha256sum: "d01a26bc88851aab4c986e820e7b3885cedf1316a9c26a98fbba83105cfd7b87"
+        url: "https://github.com/cloudflare/cfssl/releases/download/v1.4.1/cfssl_1.4.1_linux_amd64"
+  cfssljson: 
+    name: cfssljson
+    versions:
+      "1.4.1":
+        sha256sum: "05d67e05cacb8b2e78e737637acdcf9127b0732f0c4104403e9e9b74032fd685"
+        url: "https://github.com/cloudflare/cfssl/releases/download/v1.4.1/cfssljson_1.4.1_linux_amd64"
+  etcd: 
+    name: etcd.tar.gz
+    versions:
+      "v3.4.9":
+        sha256sum: "bcab421f6bf4111accfceb004e0a0ac2bcfb92ac93081d9429e313248dd78c41"
+        url: "https://github.com/etcd-io/etcd/releases/download/v3.4.9/etcd-v3.4.9-linux-amd64.tar.gz"
+  kubernetes-server: 
+    name: kubernetes-server.tar.gz
+    versions:
+      "v1.16.3":
+        sha256sum: "199a3d8528e937de6d66071c4879e9b25e93a745cfec2bed7263db75a51d628b"
+        url: "https://dl.k8s.io/v1.16.3/kubernetes-server-linux-amd64.tar.gz"
+  kubernetes-node: 
+    name: kubernetes-node.tar.gz
+    versions:
+      "v1.16.3":
+        sha256sum: "9f85620d99037486f325247c6cf35d2bd7138bb24f2fdc42158db7aed53515cd"
+        url: "https://dl.k8s.io/v1.16.3/kubernetes-node-linux-amd64.tar.gz"
+  cni-plugins: 
+    name: cni-plugins.tarz
+    versions:
+      "v0.8.6":
+        sha256sum: "994fbfcdbb2eedcfa87e48d8edb9bb365f4e2747a7e47658482556c12fd9b2f5"
+        url: "https://github.com/containernetworking/plugins/releases/download/v0.8.6/cni-plugins-linux-amd64-v0.8.6.tgz"
+  helm: 
+    name: helm.tar.gz
+    versions:
+      "v3.3.1":
+        sha256sum: "81e3974927b4f76e9f679d1f6d6b45748f8c84081a571741d48b2902d816e14c"
+        url: "https://get.helm.sh/helm-v3.3.1-linux-amd64.tar.gz"
+  kubectl-ko:
+    name: kubectl-ko
+    versions:
+      "v1.4.0":
+        sha256sum: "b2216939a08575cf547ad1e7d7df833ecbdc787769496bdaf4b7102183263c00"
+        url: "https://raw.githubusercontent.com/alauda/kube-ovn/release-1.4/dist/images/kubectl-ko"

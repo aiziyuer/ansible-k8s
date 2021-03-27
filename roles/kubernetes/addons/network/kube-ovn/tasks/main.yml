@@ -27,7 +27,7 @@
 - name: copy binaries
   copy: remote_src=yes src={{ item.src }} dest={{ item.dest | default("/usr/local/bin") }} mode=0755
   with_items:
-   - { src: "/tmp/repository/kubectl-ko", dest: '/usr/local/bin/kubectl-ko'}
+   - { src: "/tmp/repository/{{ binaries['kubectl-ko']['name'] }}", dest: '/usr/local/bin/kubectl-ko'}
 
 # - name: wait app ready with lables
 #   when:

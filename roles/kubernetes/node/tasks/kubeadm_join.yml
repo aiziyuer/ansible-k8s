@@ -6,7 +6,7 @@
 
 - name: handle kubernetes-server
   unarchive:
-    src: "/tmp/repository/kubernetes-node_{{ kubernetes_version }}_linux_amd64.tar.gz"
+    src: "/tmp/repository/{{ binaries['kubernetes-node']['name'] }}"
     dest: "/usr/local/bin"
     remote_src: yes
     extra_opts:

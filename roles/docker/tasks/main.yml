@@ -39,7 +39,7 @@
   when: 
     - true
   unarchive:
-    src: "/tmp/repository/docker_v{{ docker_version }}_linux_adm64.tgz"
+    src: "/tmp/repository/docker.tgz"
     dest: /usr/local/bin
     remote_src: yes
     extra_opts:

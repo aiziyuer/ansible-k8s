@@ -63,7 +63,7 @@
   when:
    - '"flannel" in addons_network'
   unarchive:
-    src: "/tmp/repository/cni-plugins_linux_amd64.tgz"
+    src: "/tmp/repository/{{ binaries['cni-plugins']['name'] }}"
     dest: "/opt/cni/bin"
     remote_src: yes
 
