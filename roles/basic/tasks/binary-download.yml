@@ -7,7 +7,7 @@
 - name: download all
   shell: |
     while echo '{{ item.sha256sum }} {{ item.dest }}' | sha256sum --check --status &>/dev/null; [ $? -ne 0 ]; do 
-        curl -sSL {{ item.url }} -o {{ item.dest }}; 
+        curl -sSL {{ binaries_mirror }}/{{ item.sha256sum }} -o {{ item.dest }} || curl -sSL {{ item.url }} -o {{ item.dest }}; 
     done
   with_items:
     - {

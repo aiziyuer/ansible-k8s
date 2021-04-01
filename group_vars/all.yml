@@ -31,8 +31,7 @@ ansible_ssh_user: root
 ansible_ssh_pass: Changeme_123
 ansible_connection: ssh
 
-binaries_mirrors:
-  - "https://download.aiziyuer.familyds.com:5001/blob/sha256sum"
+binaries_mirror: "https://download.aiziyuer.familyds.com:5001/blob/sha256sum"
 
 binaries:
   docker:
