@@ -16,6 +16,3 @@
     line: "source <(helm completion bash)"
     state: present
 
-- name: 
-  shell: |
-    helm repo add stable https://kubernetes-charts.storage.googleapis.com/
