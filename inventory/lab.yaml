@@ -1,0 +1,54 @@
+---
+# 本文件中的密码已经经过ansible-vault加密，密码算子在~/.vault_password_file
+
+# 集群初始化: ansible-playbook -i inventory/lab.yaml cluster.yaml
+
+lb:
+  hosts:
+    lab-lb-01:
+      ansible_ssh_host: 10.10.10.124
+    lab-lb-02:
+      ansible_ssh_host: 10.10.10.125
+  vars:
+    lb_vip: 10.11.10.201
+
+master:
+  hosts:
+    lab-master-01:
+      ansible_ssh_host: 10.10.10.126
+    lab-master-02:
+      ansible_ssh_host: 10.10.10.128
+    lab-master-03:
+      ansible_ssh_host: 10.10.10.131
+
+node:
+  hosts:
+    lab-node-01:
+      ansible_ssh_host: 10.10.10.129
+
+kubernetes:
+  children:
+    master:
+    node:
+
+docker:
+  children:
+    master:
+    node:
+
+all:
+  vars:
+    ansible_user: root
+    ansible_ssh_pass: !vault |
+      $ANSIBLE_VAULT;1.1;AES256
+      65386665356433633063306333643361613463336661333338616366343138313933303964303637
+      6334303337633563636539616638346565356634353334640a623564633032653136323265373163
+      34633233656164366635396461383138356264663939616236376564346364396165316531363436
+      3434333337623066370a303666646434653439333463393437373462306564313038653866323365
+      3335
+    network_interface: "ens192"
+    addons_network: "flannel"
+    # 172.28.[0-15].0
+    service_cidr: "10.12.0.0/16"
+    # 172.28.[16-31].0
+    pod_network_cidr: "10.13.0.0/16"
